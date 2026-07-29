@@ -2,18 +2,37 @@ import streamlit as st
 from notion_client import Client
 
 # --- CONFIGURAÇÕES ---
-# COLE SEU TOKEN AQUI (entre as aspas)
 NOTION_TOKEN = "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"
 
-# IDs das tabelas
-DATABASE_ID_PROJETOS = "f45980a4-81f8-4bfb-890f-dccc7701848b"
-DATABASE_ID_CENARIOS = "3ac4a13f-92e7-8045-95c8-fe2ebde78bcb"
-
-st.set_page_config(page_title="Sistema de Aprovação", page_icon="️", layout="wide")
+st.set_page_config(page_title="Sistema de Aprovação", page_icon="🏛️", layout="wide")
 st.title("🏛️ Sistema de Aprovação - Compliance Tributário")
 st.markdown("---")
 
 notion = Client(auth=NOTION_TOKEN)
+
+# --- Buscar tabelas automaticamente ---
+def encontrar_tabela(nome_tabela):
+    """Busca uma tabela pelo nome"""
+    response = notion.search(
+        query=nome_tabela,
+        filter={"value": "database", "property": "object"}
+    )
+    resultados = response.get("results", [])
+    if resultados:
+        return resultados[0]["id"]
+    return None
+
+# Encontra os IDs das tabelas automaticamente
+id_projetos = encontrar_tabela("Projetos")
+id_cenarios = encontrar_tabela("Cenário")
+
+if not id_projetos:
+    st.error("❌ Tabela 'Projetos' não encontrada. Verifique o nome no Notion.")
+    st.stop()
+
+if not id_cenarios:
+    st.error("❌ Tabela 'Cenário' não encontrada. Verifique o nome no Notion.")
+    st.stop()
 
 # --- SIDEBAR: Seleção de Projetos ---
 st.sidebar.title(" Projetos")
@@ -21,7 +40,7 @@ st.sidebar.title(" Projetos")
 try:
     # Busca todos os projetos
     projetos_response = notion.databases.query(
-        database_id=DATABASE_ID_PROJETOS
+        database_id=id_projetos
     )
     projetos = projetos_response.get("results", [])
     
@@ -31,10 +50,13 @@ try:
         for proj in projetos:
             props = proj["properties"]
             nome_proj = "Sem nome"
-            if "Projeto" in props:
-                titulos = props["Projeto"].get("title", [])
-                if titulos:
-                    nome_proj = titulos[0].get("plain_text", "Sem nome")
+            # Tenta várias colunas possíveis
+            for col in ["Projeto", "Nome", "Name"]:
+                if col in props:
+                    titulos = props[col].get("title", [])
+                    if titulos:
+                        nome_proj = titulos[0].get("plain_text", "Sem nome")
+                        break
             lista_projetos.append({"id": proj["id"], "nome": nome_proj})
         
         # Dropdown para selecionar projeto
@@ -48,11 +70,11 @@ try:
             st.sidebar.success(f"✅ Projeto: {projeto_escolhido['nome']}")
             
             # --- ÁREA PRINCIPAL: Cenários do Projeto ---
-            st.header(f"📋 Cenários - {projeto_escolhido['nome']}")
+            st.header(f" Cenários - {projeto_escolhido['nome']}")
             
             # Busca cenários relacionados ao projeto
             cenarios_response = notion.databases.query(
-                database_id=DATABASE_ID_CENARIOS,
+                database_id=id_cenarios,
                 filter={
                     "property": "Projeto",
                     "relation": {
@@ -64,7 +86,7 @@ try:
             cenarios = cenarios_response.get("results", [])
             
             if not cenarios:
-                st.info(" Nenhum cenário encontrado para este projeto.")
+                st.info("📭 Nenhum cenário encontrado para este projeto.")
             else:
                 st.success(f"✅ Encontrados **{len(cenarios)}** cenário(s)")
                 
@@ -73,10 +95,12 @@ try:
                     
                     # Nome do cenário
                     nome_cenario = "Sem nome"
-                    if "Cenário" in props:
-                        titulos = props["Cenário"].get("title", [])
-                        if titulos:
-                            nome_cenario = titulos[0].get("plain_text", "Sem nome")
+                    for col in ["Cenário", "Nome", "Name"]:
+                        if col in props:
+                            titulos = props[col].get("title", [])
+                            if titulos:
+                                nome_cenario = titulos[0].get("plain_text", "Sem nome")
+                                break
                     
                     # Status
                     status = "Desconhecido"
@@ -114,7 +138,7 @@ try:
                         
                         with col2:
                             if anexos:
-                                st.write("** Arquivos:**")
+                                st.write("**📎 Arquivos:**")
                                 for arquivo in anexos:
                                     st.link_button(
                                         f"📥 {arquivo['nome']}",
@@ -159,4 +183,4 @@ try:
         
 except Exception as e:
     st.error(f"❌ Erro: {str(e)}")
-    st.info(" Verifique se os IDs das tabelas estão corretos e se a integração tem acesso.")
+    st.info("💡 Verifique se as tabelas 'Projetos' e 'Cenário' existem no Notion.")
