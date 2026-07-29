@@ -2,11 +2,14 @@ import streamlit as st
 from notion_client import Client
 
 # --- CONFIGURAÇÕES ---
-NOTION_TOKEN = st.secrets["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"]  # Token seguro
-DATABASE_ID_PROJETOS = "f45980a4-81f8-4bfb-890f-dccc7701848b"  # ID da tabela Projetos
-DATABASE_ID_CENARIOS = "3ac4a13f-92e7-8045-95c8-fe2ebde78bcb"  # ID da tabela Cenários
+# COLE SEU TOKEN AQUI (entre as aspas)
+NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Sistema de Aprovação", page_icon="🏛️", layout="wide")
+# IDs das tabelas
+DATABASE_ID_PROJETOS = "f45980a4-81f8-4bfb-890f-dccc7701848b"
+DATABASE_ID_CENARIOS = "3ac4a13f-92e7-8045-95c8-fe2ebde78bcb"
+
+st.set_page_config(page_title="Sistema de Aprovação", page_icon="️", layout="wide")
 st.title("🏛️ Sistema de Aprovação - Compliance Tributário")
 st.markdown("---")
 
@@ -45,7 +48,7 @@ try:
             st.sidebar.success(f"✅ Projeto: {projeto_escolhido['nome']}")
             
             # --- ÁREA PRINCIPAL: Cenários do Projeto ---
-            st.header(f" Cenários - {projeto_escolhido['nome']}")
+            st.header(f"📋 Cenários - {projeto_escolhido['nome']}")
             
             # Busca cenários relacionados ao projeto
             cenarios_response = notion.databases.query(
@@ -61,7 +64,7 @@ try:
             cenarios = cenarios_response.get("results", [])
             
             if not cenarios:
-                st.info("📭 Nenhum cenário encontrado para este projeto.")
+                st.info(" Nenhum cenário encontrado para este projeto.")
             else:
                 st.success(f"✅ Encontrados **{len(cenarios)}** cenário(s)")
                 
@@ -111,7 +114,7 @@ try:
                         
                         with col2:
                             if anexos:
-                                st.write("**📎 Arquivos:**")
+                                st.write("** Arquivos:**")
                                 for arquivo in anexos:
                                     st.link_button(
                                         f"📥 {arquivo['nome']}",
@@ -140,7 +143,7 @@ try:
                                     st.rerun()
                             
                             with col_reprovar:
-                                if st.button(" Reprovar", key=f"rp_{cenario['id']}"):
+                                if st.button("❌ Reprovar", key=f"rp_{cenario['id']}"):
                                     notion.pages.update(
                                         page_id=cenario["id"],
                                         properties={
@@ -156,4 +159,4 @@ try:
         
 except Exception as e:
     st.error(f"❌ Erro: {str(e)}")
-    st.info("💡 Verifique se os IDs das tabelas estão corretos e se a integração tem acesso.")
+    st.info(" Verifique se os IDs das tabelas estão corretos e se a integração tem acesso.")
