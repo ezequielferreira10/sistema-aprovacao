@@ -6,9 +6,9 @@ import ssl
 
 NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
+st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
-# --- CSS PERSONALIZADO (Cores padronizadas: Azul #0A5AA5 e Laranja #FF6C12) ---
+# --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -20,7 +20,6 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
     
-    /* Sidebar */
     [data-testid="stSidebar"] {
         background-color: #0A5AA5;
         padding: 2rem 1.5rem;
@@ -33,13 +32,11 @@ st.markdown("""
         color: #000000 !important;
     }
     
-    /* Main */
     .main {
         background-color: #ffffff;
         padding: 2rem 3rem;
     }
     
-    /* Header */
     .header {
         background-color: #0A5AA5;
         padding: 3rem 2rem;
@@ -62,7 +59,6 @@ st.markdown("""
         font-weight: 500;
     }
     
-    /* Scenario card */
     .scenario-card {
         background: white;
         border-radius: 16px;
@@ -81,7 +77,6 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Status badge */
     .status-badge {
         display: inline-block;
         padding: 0.5rem 1.25rem;
@@ -91,21 +86,10 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .status-aprovado { 
-        background: #0A5AA5; 
-        color: white; 
-    }
-    .status-reprovado { 
-        background: #FF6C12; 
-        color: white; 
-    }
-    .status-pendente { 
-        background: #f1f5f9; 
-        color: #0A5AA5;
-        border: 2px solid #0A5AA5;
-    }
+    .status-aprovado { background: #0A5AA5; color: white; }
+    .status-reprovado { background: #FF6C12; color: white; }
+    .status-pendente { background: #f1f5f9; color: #0A5AA5; border: 2px solid #0A5AA5; }
     
-    /* Info box */
     .info-box {
         background: #f8f9fa;
         padding: 1.5rem;
@@ -115,7 +99,6 @@ st.markdown("""
         border: 1px solid #e5e7eb;
     }
     
-    /* Files section */
     .files-section {
         margin: 1.5rem 0 0.5rem 0;
         padding: 0;
@@ -130,7 +113,6 @@ st.markdown("""
         display: inline-block;
     }
     
-    /* File row */
     .file-row {
         display: flex;
         justify-content: space-between;
@@ -140,7 +122,6 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 0.5rem;
         border: 1px solid #e5e7eb;
-        transition: all 0.2s ease;
         gap: 1rem;
     }
     .file-row:hover {
@@ -152,17 +133,12 @@ st.markdown("""
         color: #000000;
         font-size: 1rem;
         flex: 1;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
     .file-name::before {
         content: "📄 ";
         margin-right: 0.5rem;
     }
     
-    /* Streamlit buttons - PADRONIZADOS */
     .stButton > button {
         border-radius: 10px;
         font-weight: 600;
@@ -170,8 +146,6 @@ st.markdown("""
         padding: 0.75rem 1.5rem;
         transition: all 0.3s ease;
     }
-    
-    /* Botão primário (Aprovar, Salvar) - Azul outline */
     .stButton > button[kind="primary"] {
         background: white;
         color: #0A5AA5;
@@ -181,8 +155,6 @@ st.markdown("""
         background: #0A5AA5;
         color: white;
     }
-    
-    /* Botão secundário (Reprovar, Download) - Laranja outline */
     .stButton > button[kind="secondary"] {
         background: white;
         color: #FF6C12;
@@ -192,20 +164,12 @@ st.markdown("""
         background: #FF6C12;
         color: white;
     }
-    
-    /* Botão tertiary (ghost) - Cinza outline */
     .stButton > button[kind="tertiary"] {
         background: white;
         color: #64748b;
         border: 2px solid #e2e8f0;
     }
-    .stButton > button[kind="tertiary"]:hover {
-        background: #f1f5f9;
-        border-color: #0A5AA5;
-        color: #0A5AA5;
-    }
     
-    /* Form inputs */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -220,7 +184,6 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(10, 90, 165, 0.1);
     }
     
-    /* Expander */
     .stExpander {
         border: 1px solid #e5e7eb;
         border-radius: 12px;
@@ -241,13 +204,58 @@ st.markdown("""
         color: #000000;
     }
     
-    /* Seção de decisão final */
-    .decision-section {
+    .analise-por-setor {
         background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin: 1.5rem 0;
         border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .analise-por-setor.aprovado {
+        border-left: 4px solid #0A5AA5;
+        background: #f0f9ff;
+    }
+    .analise-por-setor.reprovado {
+        border-left: 4px solid #FF6C12;
+        background: #fff7ed;
+    }
+    .setor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .setor-nome {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #000000;
+    }
+    .analista-info {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    .motivo-box {
+        background: #fef2f2;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        border-left: 3px solid #FF6C12;
+    }
+    .motivo-label {
+        font-weight: 600;
+        color: #dc2626;
+        margin-bottom: 0.5rem;
+    }
+    .ja-analisado-msg {
+        background: #f1f5f9;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        color: #64748b;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -312,7 +320,6 @@ def get_people_safe(props, coluna_nome):
     return "Não definido"
 
 def baixar_arquivo_notion(url):
-    """Baixa arquivo do Notion com tratamento de SSL e headers"""
     try:
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
@@ -321,9 +328,9 @@ def baixar_arquivo_notion(url):
         req = urllib.request.Request(
             url,
             headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 'Accept': '*/*',
-                'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Accept-Language': 'pt-BR,pt;q=0.9',
             }
         )
         with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
@@ -463,7 +470,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                 elif status == "Reprovado":
                     card_class += " scenario-card-reprovado"
                 
-                with st.expander(f"📄 {nome_cenario}", expanded=False):
+                with st.expander(f" {nome_cenario}", expanded=False):
                     st.markdown(f"""
                     <div class="{card_class}">
                         <div class="scenario-title">{nome_cenario}</div>
@@ -482,11 +489,11 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     st.markdown(f"""
                     <div class="info-box">
                         <strong>👤 Responsável:</strong> {responsavel}<br><br>
-                        <strong>📊 Status:</strong> {status}
+                        <strong> Status:</strong> {status}
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # SEÇÃO DE ANEXOS
+                    # ANEXOS
                     if anexos:
                         titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
                         
@@ -535,89 +542,182 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     
                     st.markdown("---")
                     
-                    # FORMULÁRIO
-                    st.markdown("###  Registrar Nova Análise")
+                    # ANÁLISES POR SETOR
+                    st.markdown("### 📊 Análises por Setor")
                     
-                    with st.form(key=f"form_analise_{cenario['id']}"):
-                        col_f1, col_f2 = st.columns(2)
-                        
-                        with col_f1:
-                            nome_input = st.text_input("Analista Responsável", placeholder="Ex: João Silva")
-                            setor_input = st.selectbox(
-                                "Setor",
-                                options=[""] + opcoes_setor,
-                                format_func=lambda x: "Selecione o setor" if x == "" else x,
-                                index=0
-                            )
-                        
-                        with col_f2:
-                            status_input = st.selectbox(
-                                "Status",
-                                options=[""] + opcoes_status,
-                                format_func=lambda x: "Selecione o status" if x == "" else x,
-                                index=0
-                            )
-                            motivo_input = st.text_area(
-                                "Motivo (obrigatório se reprovado)",
-                                placeholder="Explique o motivo da reprovação..."
-                            )
-                        
-                        submit = st.form_submit_button("💾 Salvar Análise", type="primary", use_container_width=True)
-                        
-                        if submit:
-                            if not nome_input:
-                                st.error("❌ Preencha o nome do analista.")
-                            elif not setor_input:
-                                st.error("❌ Selecione o setor.")
-                            elif not status_input:
-                                st.error(" Selecione o status.")
-                            elif status_input == "Reprovado" and not motivo_input:
-                                st.error("❌ Informe o motivo da reprovação.")
-                            else:
-                                try:
-                                    data_hoje = datetime.now().strftime("%Y-%m-%d")
-                                    
-                                    propriedades = {}
-                                    
-                                    if coluna_titulo_analise:
-                                        propriedades[coluna_titulo_analise] = {"title": [{"text": {"content": nome_input}}]}
-                                    
-                                    if colunas_reais.get("setor"):
-                                        propriedades[colunas_reais["setor"]] = {"select": {"name": setor_input}}
-                                    if colunas_reais.get("status"):
-                                        propriedades[colunas_reais["status"]] = {"select": {"name": status_input}}
-                                    if colunas_reais.get("motivo"):
-                                        propriedades[colunas_reais["motivo"]] = {"rich_text": [{"text": {"content": motivo_input}}] if motivo_input else []}
-                                    if colunas_reais.get("data"):
-                                        propriedades[colunas_reais["data"]] = {"date": {"start": data_hoje}}
-                                    if col_relation:
-                                        propriedades[col_relation] = {"relation": [{"id": cenario["id"]}]}
-                                    
-                                    notion.pages.create(parent={"database_id": id_analises}, properties=propriedades)
-                                    st.success(f"✅ Análise de '{nome_input}' salva com sucesso!")
-                                    st.rerun()
-                                except Exception as e:
-                                    st.error(f"❌ Erro ao salvar: {e}")
+                    analises_response = notion.databases.query(
+                        database_id=id_analises,
+                        filter={
+                            "property": col_relation,
+                            "relation": {"contains": cenario["id"]}
+                        }
+                    )
+                    analises = analises_response.get("results", [])
+                    
+                    # Agrupar análises por setor
+                    analises_por_setor = {}
+                    for analise in analises:
+                        a_props = analise.get("properties", {})
+                        setor = get_status_safe(a_props, colunas_reais.get("setor"))
+                        if setor not in analises_por_setor:
+                            analises_por_setor[setor] = analise
+                    
+                    # Mostrar análises existentes
+                    if analises_por_setor:
+                        for setor, analise in analises_por_setor.items():
+                            a_props = analise.get("properties", {})
+                            
+                            nome_analise = get_titulo_safe(a_props, coluna_titulo_analise)
+                            status_analise = get_status_safe(a_props, colunas_reais.get("status"))
+                            motivo = get_texto_safe(a_props, colunas_reais.get("motivo"))
+                            
+                            classe_analise = "analise-por-setor aprovado" if status_analise == "Aprovado" else "analise-por-setor reprovado"
+                            
+                            st.markdown(f"""
+                            <div class="{classe_analise}">
+                                <div class="setor-header">
+                                    <div>
+                                        <div class="setor-nome"> {setor}</div>
+                                        <div class="analista-info">👤 {nome_analise}</div>
+                                    </div>
+                                    <span class="status-badge {'status-aprovado' if status_analise == 'Aprovado' else 'status-reprovado'}">
+                                        {'✅ APROVADO' if status_analise == 'Aprovado' else '❌ REPROVADO'}
+                                    </span>
+                                </div>
+                                {f'<div class="motivo-box"><div class="motivo-label">📝 Motivo da Reprovação:</div>{motivo}</div>' if status_analise == 'Reprovado' and motivo else ''}
+                            </div>
+                            """, unsafe_allow_html=True)
+                    
+                    # BOTÕES DE APROVAÇÃO/REPROVAÇÃO (sem formulário)
+                    st.markdown("---")
+                    st.markdown("### ✅ Sua Análise")
+                    
+                    # Verificar se o usuário já analisou (precisa selecionar o setor primeiro)
+                    setor_usuario = st.selectbox(
+                        "Selecione seu setor para analisar:",
+                        options=[""] + opcoes_setor,
+                        format_func=lambda x: "Selecione seu setor" if x == "" else x,
+                        key=f"setor_user_{cenario['id']}",
+                        index=0
+                    )
+                    
+                    if setor_usuario:
+                        # Verificar se este setor já analisou
+                        if setor_usuario in analises_por_setor:
+                            st.markdown("""
+                            <div class="ja-analisado-msg">
+                                ✅ Seu setor já realizou a análise deste cenário. Não é possível alterar.
+                            </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            # Mostrar campos para análise
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                nome_analista = st.text_input(
+                                    "Seu nome:",
+                                    placeholder="Ex: João Silva",
+                                    key=f"nome_analista_{cenario['id']}"
+                                )
+                            
+                            with col2:
+                                st.markdown("**Sua decisão:**")
+                            
+                            col_btn1, col_btn2 = st.columns(2)
+                            
+                            with col_btn1:
+                                if st.button("✅ Aprovar", type="primary", use_container_width=True, key=f"btn_aprovar_{cenario['id']}"):
+                                    if not nome_analista:
+                                        st.error("❌ Preencha seu nome.")
+                                    else:
+                                        try:
+                                            data_hoje = datetime.now().strftime("%Y-%m-%d")
+                                            
+                                            propriedades = {}
+                                            
+                                            if coluna_titulo_analise:
+                                                propriedades[coluna_titulo_analise] = {"title": [{"text": {"content": nome_analista}}]}
+                                            
+                                            if colunas_reais.get("setor"):
+                                                propriedades[colunas_reais["setor"]] = {"select": {"name": setor_usuario}}
+                                            
+                                            if colunas_reais.get("status"):
+                                                propriedades[colunas_reais["status"]] = {"select": {"name": "Aprovado"}}
+                                            
+                                            if colunas_reais.get("data"):
+                                                propriedades[colunas_reais["data"]] = {"date": {"start": data_hoje}}
+                                            
+                                            if col_relation:
+                                                propriedades[col_relation] = {"relation": [{"id": cenario["id"]}]}
+                                            
+                                            notion.pages.create(parent={"database_id": id_analises}, properties=propriedades)
+                                            st.success("✅ Análise aprovada com sucesso!")
+                                            st.rerun()
+                                        except Exception as e:
+                                            st.error(f"❌ Erro ao salvar: {e}")
+                            
+                            with col_btn2:
+                                if st.button("❌ Reprovar", type="secondary", use_container_width=True, key=f"btn_reprovar_{cenario['id']}"):
+                                    if not nome_analista:
+                                        st.error("❌ Preencha seu nome.")
+                                    else:
+                                        motivo_reprovacao = st.text_area(
+                                            "Motivo da reprovação (obrigatório):",
+                                            key=f"motivo_{cenario['id']}"
+                                        )
+                                        
+                                        if st.button("Confirmar Reprovação", key=f"confirmar_reprovar_{cenario['id']}"):
+                                            if not motivo_reprovacao:
+                                                st.error("❌ Informe o motivo da reprovação.")
+                                            else:
+                                                try:
+                                                    data_hoje = datetime.now().strftime("%Y-%m-%d")
+                                                    
+                                                    propriedades = {}
+                                                    
+                                                    if coluna_titulo_analise:
+                                                        propriedades[coluna_titulo_analise] = {"title": [{"text": {"content": nome_analista}}]}
+                                                    
+                                                    if colunas_reais.get("setor"):
+                                                        propriedades[colunas_reais["setor"]] = {"select": {"name": setor_usuario}}
+                                                    
+                                                    if colunas_reais.get("status"):
+                                                        propriedades[colunas_reais["status"]] = {"select": {"name": "Reprovado"}}
+                                                    
+                                                    if colunas_reais.get("motivo"):
+                                                        propriedades[colunas_reais["motivo"]] = {"rich_text": [{"text": {"content": motivo_reprovacao}}]}
+                                                    
+                                                    if colunas_reais.get("data"):
+                                                        propriedades[colunas_reais["data"]] = {"date": {"start": data_hoje}}
+                                                    
+                                                    if col_relation:
+                                                        propriedades[col_relation] = {"relation": [{"id": cenario["id"]}]}
+                                                    
+                                                    notion.pages.create(parent={"database_id": id_analises}, properties=propriedades)
+                                                    st.success("Análise reprovada com sucesso!")
+                                                    st.rerun()
+                                                except Exception as e:
+                                                    st.error(f"❌ Erro ao salvar: {e}")
                     
                     st.markdown("---")
                     
-                    # BOTÕES DE DECISÃO FINAL
+                    # DECISÃO FINAL DO CENÁRIO
                     if status == "Pronto para Análise":
-                        st.markdown("### ✅ Decisão Final do Cenário")
+                        st.markdown("### 🎯 Decisão Final do Cenário")
                         st.markdown("Aprove ou reprova este cenário de forma definitiva")
                         
                         col_ap, col_rp = st.columns(2)
                         with col_ap:
-                            if st.button("✅ Aprovar Cenário", type="primary", use_container_width=True, key=f"ap_{cenario['id']}"):
+                            if st.button("✅ Aprovar Cenário", type="primary", use_container_width=True, key=f"ap_final_{cenario['id']}"):
                                 notion.pages.update(
                                     page_id=cenario["id"],
                                     properties={"Status": {"select": {"name": "Aprovado"}}}
                                 )
                                 st.balloons()
-                                st.success("🎉 Cenário Aprovado com sucesso!")
+                                st.success("🎉 Cenário Aprovado!")
                                 st.rerun()
                         with col_rp:
-                            if st.button("❌ Reprovar Cenário", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
+                            if st.button("❌ Reprovar Cenário", type="secondary", use_container_width=True, key=f"rp_final_{cenario['id']}"):
                                 notion.pages.update(
                                     page_id=cenario["id"],
                                     properties={"Status": {"select": {"name": "Reprovado"}}}
