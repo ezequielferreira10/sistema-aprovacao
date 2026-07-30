@@ -5,138 +5,201 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
+st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
-
-# --- CSS PERSONALIZADO ---
+# --- CSS PERSONALIZADO (Visual Colorido) ---
 st.markdown("""
 <style>
-    * { box-sizing: border-box; }
-    body {
-        background-color: #FFFFFF;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        color: #1F2937;
-        font-size: 14px;
+    /* Fundo com cor suave */
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
     }
-    #MainMenu, footer, header { visibility: hidden; }
-    [data-testid="stSidebar"] {
-        background-color: #FFFFFF;
-        border-right: 1px solid #E5E7EB;
-        padding: 2rem 1rem;
-    }
-    .main { background-color: #FFFFFF; padding: 2rem 3rem; }
     
+    /* Cabeçalho */
     .header {
-        border-bottom: 1px solid #E5E7EB;
-        padding-bottom: 1.5rem;
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
         margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        text-align: center;
     }
     .header h1 {
-        color: #1F2937;
-        font-size: 2rem;
-        font-weight: 600;
+        color: #1e3a8a;
+        font-size: 2.5rem;
+        font-weight: 700;
         margin: 0;
-        letter-spacing: -0.5px;
     }
     .header p {
-        color: #6B7280;
-        font-size: 0.9rem;
+        color: #6b7280;
+        font-size: 1rem;
         margin: 0.5rem 0 0 0;
     }
     
-    .metric-card {
-        background: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 8px;
-        padding: 1.5rem;
-        text-align: center;
+    /* Cards de cenário */
+    .scenario-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        border-left: 6px solid #f97316;
     }
-    .metric-value {
-        font-size: 2rem;
+    
+    .scenario-card-aprovado {
+        border-left-color: #10b981;
+    }
+    
+    .scenario-card-reprovado {
+        border-left-color: #ef4444;
+    }
+    
+    /* Título do cenário */
+    .scenario-title {
+        font-size: 1.5rem;
         font-weight: 700;
-        color: #1F2937;
-        margin: 0;
-    }
-    .metric-label {
-        font-size: 0.75rem;
-        color: #6B7280;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 0.5rem;
-    }
-    
-    .badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .badge-aprovado {
-        background-color: #F0FDF4;
-        color: #166534;
-        border: 1px solid #BBF7D0;
-    }
-    .badge-reprovado {
-        background-color: #FEF2F2;
-        color: #991B1B;
-        border: 1px solid #FECACA;
-    }
-    .badge-pendente {
-        background-color: #FFF7ED;
-        color: #C2410C;
-        border: 1px solid #FED7AA;
-    }
-    
-    .analise-card {
-        background: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-left: 3px solid #F97316;
-        border-radius: 6px;
-        padding: 1.25rem;
+        color: #1f2937;
         margin-bottom: 1rem;
     }
-    .analise-card-aprovado { border-left-color: #10B981; }
-    .analise-card-reprovado { border-left-color: #EF4444; }
     
-    .stButton > button {
-        border-radius: 6px;
-        font-weight: 500;
+    /* Badge de status */
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 700;
         font-size: 0.875rem;
-        padding: 0.625rem 1.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-aprovado {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+    .status-reprovado {
+        background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+    .status-pendente {
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+        color: white;
+        box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
+    }
+    
+    /* Seções */
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 1.5rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid #f97316;
+    }
+    
+    /* Cards de análise */
+    .analysis-card {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #f97316;
+    }
+    .analysis-card-aprovado {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-left-color: #10b981;
+    }
+    .analysis-card-reprovado {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border-left-color: #ef4444;
+    }
+    
+    /* Botões */
+    .stButton > button {
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 0.75rem 2rem;
+        transition: all 0.3s ease;
+        border: none;
     }
     .stButton > button[kind="primary"] {
-        background-color: #F97316;
-        color: #FFFFFF;
-        border: 1px solid #F97316;
+        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
     }
     .stButton > button[kind="primary"]:hover {
-        background-color: #EA580C;
-    }
-    .stButton > button[kind="secondary"] {
-        background-color: #FFFFFF;
-        color: #1F2937;
-        border: 1px solid #E5E7EB;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
     }
     
+    /* Formulário */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
-        border-radius: 6px;
-        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        background: white;
     }
     .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
-        border-color: #F97316;
-        box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+        border-color: #f97316;
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
     }
     
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1e3a8a 0%, #3730a3 100%);
+        color: white;
+    }
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox label {
+        color: white !important;
+        font-weight: 600;
+    }
+    
+    /* Expander */
     .stExpander {
-        border: 1px solid #E5E7EB;
-        border-radius: 8px;
-        margin-bottom: 1rem;
+        border: none;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    /* Botões de decisão final */
+    .decision-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    /* Responsável e arquivos */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-radius: 10px;
+    }
+    
+    /* Links de arquivo */
+    .file-link {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        margin: 0.25rem;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -159,7 +222,6 @@ def encontrar_coluna(props, nomes_possiveis):
     return None
 
 def get_status_safe(props, coluna_nome):
-    """Busca o status de forma segura, sem dar erro se estiver vazio"""
     if coluna_nome and coluna_nome in props:
         col = props[coluna_nome]
         if col and isinstance(col, dict):
@@ -169,7 +231,6 @@ def get_status_safe(props, coluna_nome):
     return "Desconhecido"
 
 def get_titulo_safe(props, nomes_possiveis):
-    """Busca o título de forma segura"""
     for nome in nomes_possiveis:
         if nome in props:
             col = props[nome]
@@ -180,7 +241,6 @@ def get_titulo_safe(props, nomes_possiveis):
     return "Sem nome"
 
 def get_texto_safe(props, coluna_nome):
-    """Busca texto de forma segura"""
     if coluna_nome and coluna_nome in props:
         col = props[coluna_nome]
         if col and isinstance(col, dict):
@@ -190,7 +250,6 @@ def get_texto_safe(props, coluna_nome):
     return ""
 
 def get_people_safe(props, coluna_nome):
-    """Busca pessoa de forma segura"""
     if coluna_nome and coluna_nome in props:
         col = props[coluna_nome]
         if col and isinstance(col, dict):
@@ -212,7 +271,7 @@ if not all([id_projetos, id_cenarios, id_analises]):
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### Compliance")
+    st.markdown("### 🏛️ Compliance")
     st.markdown("---")
     
     try:
@@ -226,7 +285,7 @@ with st.sidebar:
                 nome_proj = get_titulo_safe(props, ["Projeto", "Nome", "Name"])
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
-            st.markdown("**Projetos**")
+            st.markdown("**📁 Projetos**")
             projeto_escolhido = st.selectbox(
                 "Selecione o projeto:",
                 options=lista_projetos,
@@ -236,18 +295,18 @@ with st.sidebar:
             
             if projeto_escolhido:
                 st.markdown("---")
-                st.markdown(f"**{projeto_escolhido['nome']}**")
+                st.success(f"✅ **{projeto_escolhido['nome']}**")
         else:
             st.warning("Nenhum projeto encontrado.")
     except Exception as e:
-        st.error(f"Erro ao carregar projetos: {e}")
+        st.error(f"Erro: {e}")
 
 # --- ÁREA PRINCIPAL ---
 if 'projeto_escolhido' in dir() and projeto_escolhido:
     st.markdown(f"""
     <div class="header">
-        <h1>{projeto_escolhido['nome']}</h1>
-        <p>Gestão de cenários e análises de compliance tributário</p>
+        <h1>🏛️ {projeto_escolhido['nome']}</h1>
+        <p>Sistema de Aprovação - Compliance Tributário</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -262,56 +321,8 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
         cenarios = cenarios_response.get("results", [])
         
         if not cenarios:
-            st.info("Nenhum cenário encontrado para este projeto.")
+            st.info("📭 Nenhum cenário encontrado para este projeto.")
         else:
-            # Métricas (agora com proteção contra None)
-            total_cenarios = len(cenarios)
-            aprovados = 0
-            reprovados = 0
-            pendentes = 0
-            
-            for c in cenarios:
-                props = c.get("properties", {})
-                status = get_status_safe(props, "Status")
-                if status == "Aprovado":
-                    aprovados += 1
-                elif status == "Reprovado":
-                    reprovados += 1
-                else:
-                    pendentes += 1
-            
-            col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-            with col_m1:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <p class="metric-value">{total_cenarios}</p>
-                    <p class="metric-label">Total de Cenários</p>
-                </div>
-                """, unsafe_allow_html=True)
-            with col_m2:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <p class="metric-value">{aprovados}</p>
-                    <p class="metric-label">Aprovados</p>
-                </div>
-                """, unsafe_allow_html=True)
-            with col_m3:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <p class="metric-value">{reprovados}</p>
-                    <p class="metric-label">Reprovados</p>
-                </div>
-                """, unsafe_allow_html=True)
-            with col_m4:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <p class="metric-value">{pendentes}</p>
-                    <p class="metric-label">Pendentes</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("---")
-            
             # Descobrir colunas da tabela Análises
             db_info = notion.databases.retrieve(database_id=id_analises)
             todas_props = db_info.get("properties", {})
@@ -336,7 +347,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     break
             
             # Lista de cenários
-            st.markdown("### Cenários")
+            st.markdown("## 📋 Cenários")
             
             for cenario in cenarios:
                 props = cenario.get("properties", {})
@@ -355,107 +366,45 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif arquivo.get("file", {}).get("url"):
                                 anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
                 
-                # Badge de status
+                # Classe do card baseada no status
+                card_class = "scenario-card"
                 if status == "Aprovado":
-                    badge_html = '<span class="badge badge-aprovado">Aprovado</span>'
+                    card_class += " scenario-card-aprovado"
+                    status_html = '<span class="status-badge status-aprovado">✅ APROVADO</span>'
                 elif status == "Reprovado":
-                    badge_html = '<span class="badge badge-reprovado">Reprovado</span>'
+                    card_class += " scenario-card-reprovado"
+                    status_html = '<span class="status-badge status-reprovado">❌ REPROVADO</span>'
                 else:
-                    badge_html = '<span class="badge badge-pendente">Pendente</span>'
+                    status_html = '<span class="status-badge status-pendente"> PRONTO PARA ANÁLISE</span>'
                 
-                with st.expander(f"{nome_cenario}  {badge_html}", expanded=False):
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.markdown("**Responsável**")
-                        st.markdown(responsavel)
-                    with col2:
-                        st.markdown("**Status**")
-                        st.markdown(badge_html, unsafe_allow_html=True)
-                    with col3:
-                        st.markdown("**Arquivos**")
-                        if anexos:
-                            for arquivo in anexos:
-                                st.link_button(arquivo['nome'], arquivo['url'])
-                        else:
-                            st.markdown("Nenhum arquivo")
-                    
-                    st.markdown("---")
-                    
-                    # Análises
-                    st.markdown("#### Análises por Setor")
-                    
-                    try:
-                        analises_response = notion.databases.query(
-                            database_id=id_analises,
-                            filter={
-                                "property": col_relation,
-                                "relation": {"contains": cenario["id"]}
-                            }
-                        )
-                        analises = analises_response.get("results", [])
-                    except:
-                        analises = []
-                    
-                    if analises:
-                        for analise in analises:
-                            a_props = analise.get("properties", {})
-                            
-                            nome_analise = get_titulo_safe(a_props, [colunas_reais.get("nome_analise")] if colunas_reais.get("nome_analise") else [])
-                            if nome_analise == "Sem nome":
-                                nome_analise = "Análise sem nome"
-                            
-                            setor = get_status_safe(a_props, colunas_reais.get("setor"))
-                            analista = get_texto_safe(a_props, colunas_reais.get("analista"))
-                            if not analista:
-                                analista = get_people_safe(a_props, colunas_reais.get("analista"))
-                            if not analista:
-                                analista = "Não definido"
-                            
-                            status_analise = get_status_safe(a_props, colunas_reais.get("status"))
-                            motivo = get_texto_safe(a_props, colunas_reais.get("motivo"))
-                            
-                            data_analise = ""
-                            col_data = colunas_reais.get("data")
-                            if col_data and col_data in a_props:
-                                col = a_props[col_data]
-                                if col and isinstance(col, dict):
-                                    date_info = col.get("date")
-                                    if date_info and isinstance(date_info, dict):
-                                        data_analise = date_info.get("start", "")
-                            
-                            # Card da análise
-                            if status_analise == "Aprovado":
-                                card_class = "analise-card analise-card-aprovado"
-                                badge_analise = '<span class="badge badge-aprovado">Aprovado</span>'
-                            elif status_analise == "Reprovado":
-                                card_class = "analise-card analise-card-reprovado"
-                                badge_analise = '<span class="badge badge-reprovado">Reprovado</span>'
-                            else:
-                                card_class = "analise-card"
-                                badge_analise = '<span class="badge badge-pendente">Em Análise</span>'
-                            
-                            st.markdown(f"""
-                            <div class="{card_class}">
-                                <div style="display: flex; justify-content: space-between; align-items: start;">
-                                    <div>
-                                        <strong>{nome_analise}</strong><br>
-                                        <span style="color: #6B7280; font-size: 0.875rem;">
-                                            Setor: {setor} | Analista: {analista}<br>
-                                            {f'Motivo: {motivo}<br>' if motivo else ''}
-                                            {f'Data: {data_analise}' if data_analise else ''}
-                                        </span>
-                                    </div>
-                                    <div>{badge_analise}</div>
-                                </div>
+                with st.expander(f"📄 {nome_cenario}", expanded=False):
+                    # Informações do cenário
+                    st.markdown(f"""
+                    <div class="{card_class}">
+                        <div class="scenario-title">{nome_cenario}</div>
+                        <div style="margin-bottom: 1.5rem;">{status_html}</div>
+                        
+                        <div class="info-grid">
+                            <div>
+                                <strong>👤 Responsável:</strong><br>
+                                {responsavel}
                             </div>
-                            """, unsafe_allow_html=True)
-                    else:
-                        st.info("Nenhuma análise registrada ainda.")
+                            <div>
+                                <strong>📊 Status:</strong><br>
+                                {status}
+                            </div>
+                            <div>
+                                <strong> Arquivos:</strong><br>
+                                {''.join([f'<a href="{a["url"]}" target="_blank" class="file-link">📥 {a["nome"]}</a>' for a in anexos]) if anexos else 'Nenhum arquivo'}
+                            </div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
                     st.markdown("---")
                     
-                    # Formulário
-                    st.markdown("#### Registrar Nova Análise")
+                    # --- FORMULÁRIO PARA NOVA ANÁLISE ---
+                    st.markdown("### 📝 Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
@@ -475,18 +424,18 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             )
                             motivo_input = st.text_area(
                                 "Motivo (obrigatório se reprovado)",
-                                placeholder="Explique o motivo..."
+                                placeholder="Explique o motivo da reprovação..."
                             )
                         
-                        submit = st.form_submit_button("Salvar Análise", type="primary")
+                        submit = st.form_submit_button("💾 Salvar Análise", type="primary", use_container_width=True)
                         
                         if submit:
                             if not nome_input:
-                                st.error("Preencha o nome da análise.")
+                                st.error("❌ Preencha o nome da análise.")
                             elif not analista_input:
-                                st.error("Preencha o nome do analista.")
+                                st.error("❌ Preencha o nome do analista.")
                             elif status_input == "Reprovado" and not motivo_input:
-                                st.error("Informe o motivo da reprovação.")
+                                st.error("❌ Informe o motivo da reprovação.")
                             else:
                                 try:
                                     data_hoje = datetime.now().strftime("%Y-%m-%d")
@@ -508,27 +457,36 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                         propriedades[col_relation] = {"relation": [{"id": cenario["id"]}]}
                                     
                                     notion.pages.create(parent={"database_id": id_analises}, properties=propriedades)
-                                    st.success(f"Análise '{nome_input}' salva com sucesso!")
+                                    st.success(f"✅ Análise '{nome_input}' salva com sucesso!")
                                     st.rerun()
                                 except Exception as e:
-                                    st.error(f"Erro ao salvar: {e}")
+                                    st.error(f"❌ Erro ao salvar: {e}")
                     
                     st.markdown("---")
                     
-                    # Botões finais
+                    # --- BOTÕES DE DECISÃO FINAL ---
                     if status == "Pronto para Análise":
-                        st.markdown("#### Decisão Final")
+                        st.markdown("### ✅ Decisão Final do Cenário")
+                        st.markdown("Aprove ou reprova este cenário de forma definitiva")
+                        
                         col_ap, col_rp = st.columns(2)
                         with col_ap:
-                            if st.button("Aprovar Cenário", type="primary", use_container_width=True, key=f"ap_{cenario['id']}"):
-                                notion.pages.update(page_id=cenario["id"], properties={"Status": {"select": {"name": "Aprovado"}}})
-                                st.success("Cenário Aprovado!")
+                            if st.button("✅ APROVAR CENÁRIO", type="primary", use_container_width=True, key=f"ap_{cenario['id']}"):
+                                notion.pages.update(
+                                    page_id=cenario["id"],
+                                    properties={"Status": {"select": {"name": "Aprovado"}}}
+                                )
+                                st.balloons()
+                                st.success("🎉 Cenário Aprovado com sucesso!")
                                 st.rerun()
                         with col_rp:
-                            if st.button("Reprovar Cenário", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
-                                notion.pages.update(page_id=cenario["id"], properties={"Status": {"select": {"name": "Reprovado"}}})
+                            if st.button("❌ REPROVAR CENÁRIO", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
+                                notion.pages.update(
+                                    page_id=cenario["id"],
+                                    properties={"Status": {"select": {"name": "Reprovado"}}}
+                                )
                                 st.error("Cenário Reprovado!")
                                 st.rerun()
     
     except Exception as e:
-        st.error(f"Erro: {e}")
+        st.error(f"❌ Erro: {e}")
