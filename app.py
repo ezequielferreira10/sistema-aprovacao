@@ -5,16 +5,24 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
+
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
 # --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
-    .main { background-color: #f8fafc; padding: 2rem 3rem; }
+    /* Reset e base */
+    * { box-sizing: border-box; }
+    
+    body {
+        background-color: #f1f5f9;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e3a8a 0%, #3730a3 100%);
-        color: white;
-        padding: 2rem 1rem;
+        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+        padding: 2rem 1.5rem;
     }
     [data-testid="stSidebar"] * { color: white !important; }
     [data-testid="stSidebar"] .stSelectbox > div > div > div {
@@ -24,93 +32,96 @@ st.markdown("""
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
         color: #1f2937 !important;
     }
-    [data-testid="stSidebar"] .stSelectbox label {
-        color: white !important;
-        font-weight: 600;
-        font-size: 1rem;
+    
+    /* Main */
+    .main {
+        background-color: #f1f5f9;
+        padding: 2rem 3rem;
     }
     
+    /* Header */
     .header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 3rem 2rem;
-        border-radius: 15px;
-        margin-bottom: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2.5rem;
         text-align: center;
-        box-shadow: 0 10px 30px rgba(30, 58, 138, 0.3);
+        box-shadow: 0 20px 40px rgba(30, 58, 138, 0.2);
     }
     .header h1 {
         color: white;
         font-size: 3rem;
-        font-weight: 700;
+        font-weight: 800;
         margin: 0;
         letter-spacing: -1px;
     }
     .header p {
         color: rgba(255,255,255,0.9);
-        font-size: 1.25rem;
-        margin: 1rem 0 0 0;
+        font-size: 1.2rem;
+        margin: 0.75rem 0 0 0;
+        font-weight: 500;
     }
     
+    /* Scenario card */
     .scenario-card {
         background: white;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 2rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         border-left: 6px solid #f97316;
     }
     .scenario-card-aprovado { border-left-color: #10b981; }
     .scenario-card-reprovado { border-left-color: #ef4444; }
     
     .scenario-title {
-        font-size: 1.75rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 1rem;
     }
     
+    /* Status badge */
     .status-badge {
         display: inline-block;
         padding: 0.5rem 1.25rem;
-        border-radius: 25px;
+        border-radius: 999px;
         font-weight: 700;
-        font-size: 1rem;
+        font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .status-aprovado {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        background: #10b981;
         color: white;
-        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
     }
     .status-reprovado {
-        background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+        background: #ef4444;
         color: white;
-        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
     }
     .status-pendente {
-        background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+        background: #f97316;
         color: white;
-        box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
     }
     
+    /* Info box */
     .info-box {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        background: #f8fafc;
         padding: 1.5rem;
-        border-radius: 10px;
+        border-radius: 12px;
         margin-bottom: 1.5rem;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         border: 1px solid #e2e8f0;
     }
     
-    /* NOVO: Seção de arquivos com layout horizontal */
+    /* Files section */
     .files-section {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        background: white;
         padding: 2rem;
         border-radius: 12px;
         margin: 1.5rem 0;
         border: 2px solid #3b82f6;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
     }
     .files-section h4 {
         color: #1e3a8a;
@@ -119,78 +130,99 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     
-    /* NOVO: Linha de arquivo com nome + botão */
+    /* File row */
     .file-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: white;
+        background: #f8fafc;
         padding: 1rem 1.5rem;
-        border-radius: 8px;
+        border-radius: 10px;
         margin-bottom: 0.75rem;
-        border: 1px solid #bfdbfe;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    .file-row:hover {
+        background: #f1f5f9;
+        border-color: #3b82f6;
     }
     .file-name {
         font-weight: 600;
         color: #1f2937;
-        font-size: 1.05rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
     .file-icon {
-        margin-right: 0.5rem;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     
-    /* NOVO: Botão de download */
+    /* Download button */
     .download-btn {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        background: #3b82f6;
         color: white !important;
-        padding: 0.6rem 1.25rem;
+        padding: 0.5rem 1rem;
         border-radius: 8px;
         text-decoration: none;
         font-weight: 600;
-        font-size: 0.95rem;
-        box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
-        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        white-space: nowrap;
+        gap: 0.4rem;
+        border: none;
+        cursor: pointer;
     }
     .download-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 12px rgba(59, 130, 246, 0.4);
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        background: #2563eb;
+        transform: translateY(-1px);
     }
     
+    /* Form section */
+    .form-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Decision buttons */
+    .decision-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Streamlit buttons */
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
-        font-size: 1.1rem;
-        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
         transition: all 0.3s ease;
     }
     .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        background: #10b981;
         color: white;
         border: none;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
     }
     .stButton > button[kind="primary"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        background: #059669;
     }
     .stButton > button[kind="secondary"] {
-        background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+        background: #ef4444;
         color: white;
         border: none;
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
     }
     .stButton > button[kind="secondary"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+        background: #dc2626;
     }
     
+    /* Form inputs */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -205,8 +237,9 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
+    /* Expander */
     .stExpander {
-        border: 1px solid #e5e7eb;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
         margin-bottom: 1.5rem;
         background: white;
@@ -214,12 +247,13 @@ st.markdown("""
     }
     
     label {
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
         color: #374151;
     }
+    
     h3, h4 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         font-weight: 700;
         color: #1f2937;
     }
@@ -284,6 +318,16 @@ def get_people_safe(props, coluna_nome):
             if pessoas and len(pessoas) > 0:
                 return pessoas[0].get("name", "Não definido")
     return "Não definido"
+
+def baixar_arquivo(url):
+    """Baixa o arquivo e retorna o conteúdo em bytes"""
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        return response.content
+    except Exception as e:
+        st.error(f"Erro ao baixar arquivo: {e}")
+        return None
 
 # --- INICIALIZAÇÃO ---
 notion = Client(auth=NOTION_TOKEN)
@@ -373,7 +417,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     col_relation = prop_name
                     break
             
-            st.markdown("##  Cenários")
+            st.markdown("## 📋 Cenários")
             
             for cenario in cenarios:
                 props = cenario.get("properties", {})
@@ -422,7 +466,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # NOVO: Seção de arquivos com nome + botão de download ao lado
+                    # SEÇÃO DE ARQUIVOS COM DOWNLOAD FUNCIONAL
                     if anexos:
                         st.markdown(f"""
                         <div class="files-section">
@@ -430,25 +474,41 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         </div>
                         """, unsafe_allow_html=True)
                         
-                        for arquivo in anexos:
-                            st.markdown(f"""
-                            <div class="file-row">
-                                <div class="file-name">
-                                    <span class="file-icon">📄</span>
-                                    {arquivo['nome']}
-                                </div>
-                                <a href="{arquivo['url']}" target="_blank" download class="download-btn">
-                                    ⬇️ Baixar
-                                </a>
-                            </div>
-                            """, unsafe_allow_html=True)
+                        for idx, arquivo in enumerate(anexos):
+                            # Baixa o arquivo
+                            conteudo = baixar_arquivo(arquivo['url'])
+                            
+                            if conteudo:
+                                # Cria linha do arquivo
+                                col_nome, col_btn = st.columns([3, 1])
+                                
+                                with col_nome:
+                                    st.markdown(f"""
+                                    <div class="file-row">
+                                        <div class="file-name">
+                                            <span class="file-icon">📄</span>
+                                            {arquivo['nome']}
+                                        </div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                
+                                with col_btn:
+                                    # Botão de download funcional
+                                    st.download_button(
+                                        label="⬇️ Baixar",
+                                        data=conteudo,
+                                        file_name=arquivo['nome'],
+                                        mime="application/octet-stream",
+                                        key=f"download_{cenario['id']}_{idx}",
+                                        type="primary"
+                                    )
                     else:
-                        st.info(" Nenhum arquivo disponível")
+                        st.info("📭 Nenhum arquivo disponível")
                     
                     st.markdown("---")
                     
-                    # --- FORMULÁRIO PARA NOVA ANÁLISE ---
-                    st.markdown("###  Registrar Nova Análise")
+                    # FORMULÁRIO
+                    st.markdown("### 📝 Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
@@ -470,7 +530,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 placeholder="Explique o motivo da reprovação..."
                             )
                         
-                        submit = st.form_submit_button("💾 Salvar Análise", type="primary", use_container_width=True)
+                        submit = st.form_submit_button(" Salvar Análise", type="primary", use_container_width=True)
                         
                         if submit:
                             if not nome_input:
@@ -505,7 +565,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     
                     st.markdown("---")
                     
-                    # --- BOTÕES DE DECISÃO FINAL ---
+                    # BOTÕES DE DECISÃO FINAL
                     if status == "Pronto para Análise":
                         st.markdown("### ✅ Decisão Final do Cenário")
                         st.markdown("Aprove ou reprova este cenário de forma definitiva")
@@ -530,4 +590,4 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 st.rerun()
     
     except Exception as e:
-        st.error(f" Erro: {e}")
+        st.error(f"❌ Erro: {e}")
