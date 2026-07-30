@@ -5,58 +5,32 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
+
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
-# --- CSS PERSONALIZADO (Visual Premium Minimalista) ---
+# --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
-    /* Reset e base */
-    * {
-        box-sizing: border-box;
-    }
-    
+    * { box-sizing: border-box; }
     body {
         background-color: #FFFFFF;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: #1F2937;
         font-size: 14px;
-        line-height: 1.6;
     }
-    
-    /* Esconder elementos padrão do Streamlit */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    /* Sidebar estilo app premium */
+    #MainMenu, footer, header { visibility: hidden; }
     [data-testid="stSidebar"] {
         background-color: #FFFFFF;
         border-right: 1px solid #E5E7EB;
         padding: 2rem 1rem;
     }
+    .main { background-color: #FFFFFF; padding: 2rem 3rem; }
     
-    [data-testid="stSidebar"] .stSelectbox label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #6B7280;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Main content */
-    .main {
-        background-color: #FFFFFF;
-        padding: 2rem 3rem;
-    }
-    
-    /* Cabeçalho */
     .header {
         border-bottom: 1px solid #E5E7EB;
         padding-bottom: 1.5rem;
         margin-bottom: 2rem;
     }
-    
     .header h1 {
         color: #1F2937;
         font-size: 2rem;
@@ -64,28 +38,33 @@ st.markdown("""
         margin: 0;
         letter-spacing: -0.5px;
     }
-    
     .header p {
         color: #6B7280;
         font-size: 0.9rem;
         margin: 0.5rem 0 0 0;
     }
     
-    /* Cards */
-    .card {
+    .metric-card {
         background: #FFFFFF;
         border: 1px solid #E5E7EB;
         border-radius: 8px;
         padding: 1.5rem;
-        margin-bottom: 1rem;
-        transition: all 0.2s ease;
+        text-align: center;
+    }
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1F2937;
+        margin: 0;
+    }
+    .metric-label {
+        font-size: 0.75rem;
+        color: #6B7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
     }
     
-    .card:hover {
-        border-color: #F97316;
-    }
-    
-    /* Status badges */
     .badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -95,26 +74,22 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
     .badge-aprovado {
         background-color: #F0FDF4;
         color: #166534;
         border: 1px solid #BBF7D0;
     }
-    
     .badge-reprovado {
         background-color: #FEF2F2;
         color: #991B1B;
         border: 1px solid #FECACA;
     }
-    
     .badge-pendente {
         background-color: #FFF7ED;
         color: #C2410C;
         border: 1px solid #FED7AA;
     }
     
-    /* Cards de análise */
     .analise-card {
         background: #FFFFFF;
         border: 1px solid #E5E7EB;
@@ -123,117 +98,45 @@ st.markdown("""
         padding: 1.25rem;
         margin-bottom: 1rem;
     }
+    .analise-card-aprovado { border-left-color: #10B981; }
+    .analise-card-reprovado { border-left-color: #EF4444; }
     
-    .analise-card-aprovado {
-        border-left-color: #10B981;
-    }
-    
-    .analise-card-reprovado {
-        border-left-color: #EF4444;
-    }
-    
-    /* Botões */
     .stButton > button {
         border-radius: 6px;
         font-weight: 500;
         font-size: 0.875rem;
         padding: 0.625rem 1.25rem;
-        transition: all 0.2s ease;
     }
-    
     .stButton > button[kind="primary"] {
         background-color: #F97316;
         color: #FFFFFF;
         border: 1px solid #F97316;
     }
-    
     .stButton > button[kind="primary"]:hover {
         background-color: #EA580C;
-        border-color: #EA580C;
     }
-    
     .stButton > button[kind="secondary"] {
         background-color: #FFFFFF;
         color: #1F2937;
         border: 1px solid #E5E7EB;
     }
     
-    .stButton > button[kind="secondary"]:hover {
-        background-color: #F9FAFB;
-        border-color: #D1D5DB;
-    }
-    
-    /* Formulários */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
         border-radius: 6px;
         border: 1px solid #E5E7EB;
-        font-size: 0.875rem;
     }
-    
     .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
         border-color: #F97316;
         box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
     }
     
-    /* Títulos de seção */
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1F2937;
-        margin-bottom: 1rem;
-        letter-spacing: -0.3px;
-    }
-    
-    /* Métricas */
-    .metric-card {
-        background: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 8px;
-        padding: 1.5rem;
-        text-align: center;
-    }
-    
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1F2937;
-        margin: 0;
-    }
-    
-    .metric-label {
-        font-size: 0.75rem;
-        color: #6B7280;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 0.5rem;
-    }
-    
-    /* Expander customizado */
     .stExpander {
         border: 1px solid #E5E7EB;
         border-radius: 8px;
         margin-bottom: 1rem;
-    }
-    
-    .stExpander:hover {
-        border-color: #D1D5DB;
-    }
-    
-    /* Divisores */
-    hr {
-        border: none;
-        border-top: 1px solid #E5E7EB;
-        margin: 1.5rem 0;
-    }
-    
-    /* Labels */
-    label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #374151;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -255,21 +158,46 @@ def encontrar_coluna(props, nomes_possiveis):
             return nome
     return None
 
-def get_badge_class(status):
-    if status == "Aprovado":
-        return "badge badge-aprovado"
-    elif status == "Reprovado":
-        return "badge badge-reprovado"
-    else:
-        return "badge badge-pendente"
+def get_status_safe(props, coluna_nome):
+    """Busca o status de forma segura, sem dar erro se estiver vazio"""
+    if coluna_nome and coluna_nome in props:
+        col = props[coluna_nome]
+        if col and isinstance(col, dict):
+            select = col.get("select")
+            if select and isinstance(select, dict):
+                return select.get("name", "Desconhecido")
+    return "Desconhecido"
 
-def get_analise_card_class(status):
-    if status == "Aprovado":
-        return "analise-card analise-card-aprovado"
-    elif status == "Reprovado":
-        return "analise-card analise-card-reprovado"
-    else:
-        return "analise-card"
+def get_titulo_safe(props, nomes_possiveis):
+    """Busca o título de forma segura"""
+    for nome in nomes_possiveis:
+        if nome in props:
+            col = props[nome]
+            if col and isinstance(col, dict):
+                titulos = col.get("title", [])
+                if titulos and len(titulos) > 0:
+                    return titulos[0].get("plain_text", "Sem nome")
+    return "Sem nome"
+
+def get_texto_safe(props, coluna_nome):
+    """Busca texto de forma segura"""
+    if coluna_nome and coluna_nome in props:
+        col = props[coluna_nome]
+        if col and isinstance(col, dict):
+            textos = col.get("rich_text", [])
+            if textos and len(textos) > 0:
+                return textos[0].get("plain_text", "")
+    return ""
+
+def get_people_safe(props, coluna_nome):
+    """Busca pessoa de forma segura"""
+    if coluna_nome and coluna_nome in props:
+        col = props[coluna_nome]
+        if col and isinstance(col, dict):
+            pessoas = col.get("people", [])
+            if pessoas and len(pessoas) > 0:
+                return pessoas[0].get("name", "Não definido")
+    return "Não definido"
 
 # --- INICIALIZAÇÃO ---
 notion = Client(auth=NOTION_TOKEN)
@@ -294,14 +222,8 @@ with st.sidebar:
         if projetos:
             lista_projetos = []
             for proj in projetos:
-                props = proj["properties"]
-                nome_proj = "Sem nome"
-                for col in ["Projeto", "Nome", "Name"]:
-                    if col in props:
-                        titulos = props[col].get("title", [])
-                        if titulos:
-                            nome_proj = titulos[0].get("plain_text", "Sem nome")
-                            break
+                props = proj.get("properties", {})
+                nome_proj = get_titulo_safe(props, ["Projeto", "Nome", "Name"])
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
             st.markdown("**Projetos**")
@@ -318,11 +240,10 @@ with st.sidebar:
         else:
             st.warning("Nenhum projeto encontrado.")
     except Exception as e:
-        st.error(f"Erro: {e}")
+        st.error(f"Erro ao carregar projetos: {e}")
 
 # --- ÁREA PRINCIPAL ---
 if 'projeto_escolhido' in dir() and projeto_escolhido:
-    # Cabeçalho
     st.markdown(f"""
     <div class="header">
         <h1>{projeto_escolhido['nome']}</h1>
@@ -343,11 +264,21 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
         if not cenarios:
             st.info("Nenhum cenário encontrado para este projeto.")
         else:
-            # Métricas
+            # Métricas (agora com proteção contra None)
             total_cenarios = len(cenarios)
-            aprovados = sum(1 for c in cenarios if c["properties"].get("Status", {}).get("select", {}).get("name") == "Aprovado")
-            reprovados = sum(1 for c in cenarios if c["properties"].get("Status", {}).get("select", {}).get("name") == "Reprovado")
-            pendentes = total_cenarios - aprovados - reprovados
+            aprovados = 0
+            reprovados = 0
+            pendentes = 0
+            
+            for c in cenarios:
+                props = c.get("properties", {})
+                status = get_status_safe(props, "Status")
+                if status == "Aprovado":
+                    aprovados += 1
+                elif status == "Reprovado":
+                    reprovados += 1
+                else:
+                    pendentes += 1
             
             col_m1, col_m2, col_m3, col_m4 = st.columns(4)
             with col_m1:
@@ -408,42 +339,38 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
             st.markdown("### Cenários")
             
             for cenario in cenarios:
-                props = cenario["properties"]
+                props = cenario.get("properties", {})
                 
-                nome_cenario = "Sem nome"
-                for col in ["Cenário", "Cenario", "Nome", "Name"]:
-                    if col in props:
-                        titulos = props[col].get("title", [])
-                        if titulos:
-                            nome_cenario = titulos[0].get("plain_text", "Sem nome")
-                            break
-                
-                status = "Desconhecido"
-                if "Status" in props and props["Status"].get("select"):
-                    status = props["Status"]["select"].get("name", "Desconhecido")
-                
-                responsavel = "Não definido"
-                if "Responsável" in props and props["Responsável"].get("people"):
-                    responsavel = props["Responsável"]["people"][0].get("name", "Não definido")
+                nome_cenario = get_titulo_safe(props, ["Cenário", "Cenario", "Nome", "Name"])
+                status = get_status_safe(props, "Status")
+                responsavel = get_people_safe(props, "Responsável")
                 
                 anexos = []
                 if "Anexos" in props:
                     arquivos = props["Anexos"].get("files", [])
-                    for arquivo in arquivos:
-                        if arquivo.get("external", {}).get("url"):
-                            anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["external"]["url"]})
-                        elif arquivo.get("file", {}).get("url"):
-                            anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
+                    if arquivos:
+                        for arquivo in arquivos:
+                            if arquivo.get("external", {}).get("url"):
+                                anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["external"]["url"]})
+                            elif arquivo.get("file", {}).get("url"):
+                                anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
                 
-                with st.expander(f"{nome_cenario}", expanded=False):
-                    # Info do cenário
+                # Badge de status
+                if status == "Aprovado":
+                    badge_html = '<span class="badge badge-aprovado">Aprovado</span>'
+                elif status == "Reprovado":
+                    badge_html = '<span class="badge badge-reprovado">Reprovado</span>'
+                else:
+                    badge_html = '<span class="badge badge-pendente">Pendente</span>'
+                
+                with st.expander(f"{nome_cenario}  {badge_html}", expanded=False):
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        st.markdown(f"**Responsável**")
+                        st.markdown("**Responsável**")
                         st.markdown(responsavel)
                     with col2:
                         st.markdown("**Status**")
-                        st.markdown(f'<span class="{get_badge_class(status)}">{status}</span>', unsafe_allow_html=True)
+                        st.markdown(badge_html, unsafe_allow_html=True)
                     with col3:
                         st.markdown("**Arquivos**")
                         if anexos:
@@ -457,54 +384,58 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     # Análises
                     st.markdown("#### Análises por Setor")
                     
-                    analises_response = notion.databases.query(
-                        database_id=id_analises,
-                        filter={
-                            "property": col_relation,
-                            "relation": {"contains": cenario["id"]}
-                        }
-                    )
-                    analises = analises_response.get("results", [])
+                    try:
+                        analises_response = notion.databases.query(
+                            database_id=id_analises,
+                            filter={
+                                "property": col_relation,
+                                "relation": {"contains": cenario["id"]}
+                            }
+                        )
+                        analises = analises_response.get("results", [])
+                    except:
+                        analises = []
                     
                     if analises:
                         for analise in analises:
-                            a_props = analise["properties"]
+                            a_props = analise.get("properties", {})
                             
-                            nome_analise = "Sem nome"
-                            if colunas_reais.get("nome_analise") and colunas_reais["nome_analise"] in a_props:
-                                titulos = a_props[colunas_reais["nome_analise"]].get("title", [])
-                                if titulos:
-                                    nome_analise = titulos[0].get("plain_text", "Sem nome")
+                            nome_analise = get_titulo_safe(a_props, [colunas_reais.get("nome_analise")] if colunas_reais.get("nome_analise") else [])
+                            if nome_analise == "Sem nome":
+                                nome_analise = "Análise sem nome"
                             
-                            setor = "Não definido"
-                            if colunas_reais.get("setor") and colunas_reais["setor"] in a_props and a_props[colunas_reais["setor"]].get("select"):
-                                setor = a_props[colunas_reais["setor"]]["select"].get("name", "Não definido")
+                            setor = get_status_safe(a_props, colunas_reais.get("setor"))
+                            analista = get_texto_safe(a_props, colunas_reais.get("analista"))
+                            if not analista:
+                                analista = get_people_safe(a_props, colunas_reais.get("analista"))
+                            if not analista:
+                                analista = "Não definido"
                             
-                            analista = "Não definido"
-                            if colunas_reais.get("analista") and colunas_reais["analista"] in a_props:
-                                if a_props[colunas_reais["analista"]].get("people"):
-                                    analista = a_props[colunas_reais["analista"]]["people"][0].get("name", "Não definido")
-                                elif a_props[colunas_reais["analista"]].get("rich_text"):
-                                    textos = a_props[colunas_reais["analista"]]["rich_text"]
-                                    if textos:
-                                        analista = textos[0].get("plain_text", "Não definido")
-                            
-                            status_analise = "Não definido"
-                            if colunas_reais.get("status") and colunas_reais["status"] in a_props and a_props[colunas_reais["status"]].get("select"):
-                                status_analise = a_props[colunas_reais["status"]]["select"].get("name", "Não definido")
-                            
-                            motivo = ""
-                            if colunas_reais.get("motivo") and colunas_reais["motivo"] in a_props and a_props[colunas_reais["motivo"]].get("rich_text"):
-                                textos = a_props[colunas_reais["motivo"]]["rich_text"]
-                                if textos:
-                                    motivo = textos[0].get("plain_text", "")
+                            status_analise = get_status_safe(a_props, colunas_reais.get("status"))
+                            motivo = get_texto_safe(a_props, colunas_reais.get("motivo"))
                             
                             data_analise = ""
-                            if colunas_reais.get("data") and colunas_reais["data"] in a_props and a_props[colunas_reais["data"]].get("date"):
-                                data_analise = a_props[colunas_reais["data"]]["date"].get("start", "")
+                            col_data = colunas_reais.get("data")
+                            if col_data and col_data in a_props:
+                                col = a_props[col_data]
+                                if col and isinstance(col, dict):
+                                    date_info = col.get("date")
+                                    if date_info and isinstance(date_info, dict):
+                                        data_analise = date_info.get("start", "")
+                            
+                            # Card da análise
+                            if status_analise == "Aprovado":
+                                card_class = "analise-card analise-card-aprovado"
+                                badge_analise = '<span class="badge badge-aprovado">Aprovado</span>'
+                            elif status_analise == "Reprovado":
+                                card_class = "analise-card analise-card-reprovado"
+                                badge_analise = '<span class="badge badge-reprovado">Reprovado</span>'
+                            else:
+                                card_class = "analise-card"
+                                badge_analise = '<span class="badge badge-pendente">Em Análise</span>'
                             
                             st.markdown(f"""
-                            <div class="{get_analise_card_class(status_analise)}">
+                            <div class="{card_class}">
                                 <div style="display: flex; justify-content: space-between; align-items: start;">
                                     <div>
                                         <strong>{nome_analise}</strong><br>
@@ -514,7 +445,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                             {f'Data: {data_analise}' if data_analise else ''}
                                         </span>
                                     </div>
-                                    <span class="{get_badge_class(status_analise)}">{status_analise}</span>
+                                    <div>{badge_analise}</div>
                                 </div>
                             </div>
                             """, unsafe_allow_html=True)
