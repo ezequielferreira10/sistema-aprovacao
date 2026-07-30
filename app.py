@@ -7,7 +7,7 @@ NOTION_TOKEN = "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"
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
-# --- CSS PERSONALIZADO (Cores: Azul #0A5AA5, Laranja #FF6C12, Preto, Branco) ---
+# --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -27,9 +27,11 @@ st.markdown("""
     [data-testid="stSidebar"] * { color: white !important; }
     [data-testid="stSidebar"] .stSelectbox > div > div > div {
         background-color: white !important;
-        color: #000000 !important;
     }
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
+        color: #000000 !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox > div > div > div > div > div {
         color: #000000 !important;
     }
     
@@ -307,7 +309,7 @@ db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### 🏛️ Compliance Tributário")
+    st.markdown("### ️ Compliance Tributário")
     st.markdown("---")
     
     try:
@@ -377,9 +379,70 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
             
             col_relation = None
             for prop_name, prop_info in todas_props.items():
-                                    # SEÇÃO DE ANEXOS
+                if prop_info.get("type") == "relation":
+                    col_relation = prop_name
+                    break
+            
+            opcoes_setor = get_opcoes_select(db_info_analises, colunas_reais.get("setor"))
+            opcoes_status = get_opcoes_select(db_info_analises, colunas_reais.get("status"))
+            
+            if not opcoes_setor:
+                opcoes_setor = ["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
+            if not opcoes_status:
+                opcoes_status = ["Aprovado", "Reprovado", "Em Análise"]
+            
+            st.markdown("## 📋 Cenários")
+            
+            for cenario in cenarios:
+                props = cenario.get("properties", {})
+                
+                col_titulo_cenario = encontrar_coluna_title(props)
+                nome_cenario = get_titulo_safe(props, col_titulo_cenario)
+                status = get_status_safe(props, "Status")
+                responsavel = get_people_safe(props, "Responsável")
+                
+                # DEFINIR ANEXOS AQUI (dentro do loop)
+                anexos = []
+                if "Anexos" in props:
+                    arquivos = props["Anexos"].get("files", [])
+                    if arquivos:
+                        for arquivo in arquivos:
+                            if arquivo.get("external", {}).get("url"):
+                                anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["external"]["url"]})
+                            elif arquivo.get("file", {}).get("url"):
+                                anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
+                
+                card_class = "scenario-card"
+                if status == "Aprovado":
+                    card_class += " scenario-card-aprovado"
+                elif status == "Reprovado":
+                    card_class += " scenario-card-reprovado"
+                
+                with st.expander(f" {nome_cenario}", expanded=False):
+                    st.markdown(f"""
+                    <div class="{card_class}">
+                        <div class="scenario-title">{nome_cenario}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if status == "Aprovado":
+                        st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
+                    elif status == "Reprovado":
+                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
+                    else:
+                        st.markdown('<span class="status-badge status-pendente"> PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
+                    
+                    st.markdown("---")
+                    
+                    st.markdown(f"""
+                    <div class="info-box">
+                        <strong> Responsável:</strong> {responsavel}<br><br>
+                        <strong>📊 Status:</strong> {status}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # SEÇÃO DE ANEXOS
                     if anexos:
-                        # Título dinâmico: "Anexo" ou "Anexos"
                         titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
                         
                         st.markdown(f"""
@@ -397,78 +460,28 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             </div>
                             """, unsafe_allow_html=True)
                             
-                            # Botão de download/abertura
-                            st.download_button(
-                                label="⬇️ Baixar Arquivo",
-                                data=baixar_arquivo(arquivo['url']) or b"",
-                                file_name=arquivo['nome'],
-                                mime="application/octet-stream",
-                                key=f"download_{cenario['id']}_{idx}",
-                                type="secondary",
-                                use_container_width=True
-                            )
-                            
-                            st.markdown("<div style='margin-bottom: 0.75rem;'></div>", unsafe_allow_html=True)
-                    else:
-                        st.info("📭 Nenhum anexo disponível")                    
-                    st.markdown("---")
-                    
-                    st.markdown(f"""
-                    <div class="info-box">
-                        <strong>👤 Responsável:</strong> {responsavel}<br><br>
-                        <strong> Status:</strong> {status}
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    # SEÇÃO DE ARQUIVOS - DOWNLOAD FUNCIONAL
-                    if anexos:
-                        st.markdown(f"""
-                        <div class="files-section">
-                            <h4>📎 Arquivos Disponíveis ({len(anexos)})</h4>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        
-                        for idx, arquivo in enumerate(anexos):
-                            # Tenta baixar o arquivo
                             conteudo = baixar_arquivo(arquivo['url'])
                             
                             if conteudo:
-                                # Layout: nome à esquerda, botão à direita
-                                col_nome, col_btn = st.columns([4, 1])
-                                
-                                with col_nome:
-                                    st.markdown(f"""
-                                    <div class="file-row" style="margin-bottom: 0;">
-                                        <div class="file-name">
-                                             {arquivo['nome']}
-                                        </div>
-                                    </div>
-                                    """, unsafe_allow_html=True)
-                                
-                                with col_btn:
-                                    st.download_button(
-                                        label="⬇️ Baixar",
-                                        data=conteudo,
-                                        file_name=arquivo['nome'],
-                                        mime="application/octet-stream",
-                                        key=f"download_{cenario['id']}_{idx}",
-                                        type="primary",
-                                        use_container_width=True
-                                    )
+                                st.download_button(
+                                    label="⬇️ Baixar Arquivo",
+                                    data=conteudo,
+                                    file_name=arquivo['nome'],
+                                    mime="application/octet-stream",
+                                    key=f"download_{cenario['id']}_{idx}",
+                                    type="secondary",
+                                    use_container_width=True
+                                )
                             else:
-                                # Fallback: link direto se o download falhar
                                 st.markdown(f"""
-                                <div class="file-row">
-                                    <div class="file-name">
-                                         {arquivo['nome']}
-                                    </div>
-                                    <a href="{arquivo['url']}" target="_blank" style="background: #FF6C12; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                                        🔗 Abrir Arquivo
-                                    </a>
-                                </div>
+                                <a href="{arquivo['url']}" style="background: #FF6C12; color: white; padding: 0.75rem 1.5rem; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-block;">
+                                    🔗 Abrir Arquivo
+                                </a>
                                 """, unsafe_allow_html=True)
+                            
+                            st.markdown("<div style='margin-bottom: 0.75rem;'></div>", unsafe_allow_html=True)
                     else:
-                        st.info("📭 Nenhum arquivo disponível")
+                        st.info("📭 Nenhum anexo disponível")
                     
                     st.markdown("---")
                     
