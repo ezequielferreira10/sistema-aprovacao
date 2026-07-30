@@ -105,37 +105,73 @@ st.markdown("""
         border: 1px solid #e5e7eb;
     }
     
-    /* Files section */
+    /* Files section - mais discreta */
     .files-section {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin: 1.5rem 0;
-        border: 2px solid #0A5AA5;
-        box-shadow: 0 4px 15px rgba(10, 90, 165, 0.1);
+        margin: 1.5rem 0 0.5rem 0;
+        padding: 0;
     }
     .files-section h4 {
         color: #0A5AA5;
-        font-size: 1.3rem;
+        font-size: 1.1rem;
         font-weight: 700;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #0A5AA5;
+        display: inline-block;
     }
     
-    /* File row */
+    /* File row - nome e botão na mesma linha */
     .file-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         background: #f8f9fa;
-        padding: 1rem 1.5rem;
+        padding: 0.875rem 1.25rem;
         border-radius: 10px;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
         border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+        gap: 1rem;
+    }
+    .file-row:hover {
+        background: #f0f4f8;
+        border-color: #0A5AA5;
     }
     .file-name {
         font-weight: 600;
         color: #000000;
         font-size: 1rem;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .file-name::before {
+        content: "📄 ";
+        margin-right: 0.5rem;
+    }
+    
+    /* Botão de download compacto */
+    .file-download-btn {
+        background: #0A5AA5;
+        color: white !important;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .file-download-btn:hover {
+        background: #084a8a;
+        transform: translateY(-1px);
     }
     
     /* Streamlit buttons */
@@ -263,7 +299,6 @@ def get_people_safe(props, coluna_nome):
 def baixar_arquivo_notion(url):
     """Baixa arquivo do Notion com tratamento de SSL e headers"""
     try:
-        # Ignora verificação SSL para URLs do Notion
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
@@ -423,7 +458,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if status == "Aprovado":
                         st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
                     elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-reprovado"> REPROVADO</span>', unsafe_allow_html=True)
                     else:
                         st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
                     
@@ -436,7 +471,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # SEÇÃO DE ANEXOS COM DOWNLOAD FUNCIONAL
+                    # SEÇÃO DE ANEXOS - NOME E BOTÃO NA MESMA LINHA
                     if anexos:
                         titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
                         
@@ -447,44 +482,48 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         """, unsafe_allow_html=True)
                         
                         for idx, arquivo in enumerate(anexos):
-                            st.markdown(f"""
-                            <div class="file-row">
-                                <div class="file-name">
-                                    {arquivo['nome']}
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            # Tenta baixar o arquivo
                             conteudo = baixar_arquivo_notion(arquivo['url'])
                             
                             if conteudo:
-                                # Botão de download funcional
-                                st.download_button(
-                                    label="⬇️ Baixar Arquivo",
-                                    data=conteudo,
-                                    file_name=arquivo['nome'],
-                                    mime="application/octet-stream",
-                                    key=f"download_{cenario['id']}_{idx}",
-                                    type="secondary",
-                                    use_container_width=True
-                                )
+                                # Nome à esquerda, botão à direita
+                                col_nome, col_btn = st.columns([4, 1])
+                                
+                                with col_nome:
+                                    st.markdown(f"""
+                                    <div class="file-row" style="margin-bottom: 0;">
+                                        <div class="file-name">{arquivo['nome']}</div>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                                
+                                with col_btn:
+                                    st.download_button(
+                                        label="⬇️ Baixar",
+                                        data=conteudo,
+                                        file_name=arquivo['nome'],
+                                        mime="application/octet-stream",
+                                        key=f"download_{cenario['id']}_{idx}",
+                                        type="primary",
+                                        use_container_width=True
+                                    )
                             else:
                                 # Fallback: link direto
                                 st.markdown(f"""
-                                <a href="{arquivo['url']}" target="_blank" style="background: #FF6C12; color: white; padding: 0.75rem 1.5rem; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-block;">
-                                    🔗 Abrir Arquivo
-                                </a>
+                                <div class="file-row">
+                                    <div class="file-name">{arquivo['nome']}</div>
+                                    <a href="{arquivo['url']}" target="_blank" class="file-download-btn">
+                                        🔗 Abrir
+                                    </a>
+                                </div>
                                 """, unsafe_allow_html=True)
                             
-                            st.markdown("<div style='margin-bottom: 1rem;'></div>", unsafe_allow_html=True)
+                            st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
                     else:
                         st.info("📭 Nenhum anexo disponível")
                     
                     st.markdown("---")
                     
                     # FORMULÁRIO
-                    st.markdown("### 📝 Registrar Nova Análise")
+                    st.markdown("###  Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
@@ -574,4 +613,4 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 st.rerun()
     
     except Exception as e:
-        st.error(f" Erro: {e}")
+        st.error(f"❌ Erro: {e}")
