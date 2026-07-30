@@ -26,6 +26,23 @@ st.markdown("""
         color: white !important;
     }
     
+    /* CORREÇÃO: Selectbox na sidebar - texto escuro para ficar visível */
+    [data-testid="stSidebar"] .stSelectbox > div > div > div {
+        background-color: white !important;
+        color: #1f2937 !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
+        color: #1f2937 !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox label {
+        color: white !important;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    [data-testid="stSidebar"] .stSelectbox > div > div > div:focus {
+        border-color: #f97316 !important;
+    }
+    
     /* Cabeçalho */
     .header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
@@ -179,13 +196,49 @@ st.markdown("""
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
-    /* Info grid */
+    /* CORREÇÃO: Info box mais suave (não tão amarelo gritante) */
     .info-box {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         padding: 1.5rem;
         border-radius: 10px;
         margin-bottom: 1.5rem;
         font-size: 1.1rem;
+        border: 1px solid #e2e8f0;
+    }
+    
+    /* CORREÇÃO: Seção de arquivos mais destacada */
+    .files-section {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        border: 2px solid #3b82f6;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    }
+    .files-section h4 {
+        color: #1e3a8a;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    /* Botões de download mais visíveis */
+    .file-download-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white !important;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        margin: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s ease;
+    }
+    .file-download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
     }
     
     /* Labels do formulário */
@@ -392,25 +445,38 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     
                     st.markdown("---")
                     
-                    # Info grid
+                    # CORREÇÃO: Info box mais suave
                     st.markdown(f"""
                     <div class="info-box">
                         <strong>👤 Responsável:</strong> {responsavel}<br><br>
-                        <strong>📊 Status:</strong> {status}<br><br>
-                        <strong>📎 Arquivos:</strong> {len(anexos)} arquivo(s)
+                        <strong> Status:</strong> {status}
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # Links de arquivos
+                    # CORREÇÃO: Seção de arquivos mais destacada
                     if anexos:
-                        st.markdown("**📥 Download de Arquivos:**")
-                        for arquivo in anexos:
-                            st.link_button(f" {arquivo['nome']}", arquivo['url'])
+                        st.markdown(f"""
+                        <div class="files-section">
+                            <h4>📎 Arquivos para Download ({len(anexos)})</h4>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Botões de download mais visíveis
+                        col_files = st.columns(min(len(anexos), 3))
+                        for idx, arquivo in enumerate(anexos):
+                            with col_files[idx % len(col_files)]:
+                                st.markdown(f"""
+                                <a href="{arquivo['url']}" target="_blank" class="file-download-btn">
+                                    📥 {arquivo['nome'][:30]}{'...' if len(arquivo['nome']) > 30 else ''}
+                                </a>
+                                """, unsafe_allow_html=True)
+                    else:
+                        st.info("📭 Nenhum arquivo disponível")
                     
                     st.markdown("---")
                     
                     # --- FORMULÁRIO PARA NOVA ANÁLISE ---
-                    st.markdown("### 📝 Registrar Nova Análise")
+                    st.markdown("###  Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
@@ -486,7 +552,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 st.success("🎉 Cenário Aprovado com sucesso!")
                                 st.rerun()
                         with col_rp:
-                            if st.button(" REPROVAR CENÁRIO", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
+                            if st.button("❌ REPROVAR CENÁRIO", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
                                 notion.pages.update(
                                     page_id=cenario["id"],
                                     properties={"Status": {"select": {"name": "Reprovado"}}}
