@@ -5,28 +5,18 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
+st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
 # --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
-    /* Fundo principal */
-    .main {
-        background-color: #f8fafc;
-        padding: 2rem 3rem;
-    }
-    
-    /* Sidebar azul */
+    .main { background-color: #f8fafc; padding: 2rem 3rem; }
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1e3a8a 0%, #3730a3 100%);
         color: white;
         padding: 2rem 1rem;
     }
-    [data-testid="stSidebar"] * {
-        color: white !important;
-    }
-    
-    /* CORREÇÃO: Selectbox na sidebar - texto escuro para ficar visível */
+    [data-testid="stSidebar"] * { color: white !important; }
     [data-testid="stSidebar"] .stSelectbox > div > div > div {
         background-color: white !important;
         color: #1f2937 !important;
@@ -39,11 +29,7 @@ st.markdown("""
         font-weight: 600;
         font-size: 1rem;
     }
-    [data-testid="stSidebar"] .stSelectbox > div > div > div:focus {
-        border-color: #f97316 !important;
-    }
     
-    /* Cabeçalho */
     .header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 3rem 2rem;
@@ -65,7 +51,6 @@ st.markdown("""
         margin: 1rem 0 0 0;
     }
     
-    /* Cards de cenário */
     .scenario-card {
         background: white;
         border-radius: 12px;
@@ -74,14 +59,9 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         border-left: 6px solid #f97316;
     }
-    .scenario-card-aprovado {
-        border-left-color: #10b981;
-    }
-    .scenario-card-reprovado {
-        border-left-color: #ef4444;
-    }
+    .scenario-card-aprovado { border-left-color: #10b981; }
+    .scenario-card-reprovado { border-left-color: #ef4444; }
     
-    /* Título do cenário */
     .scenario-title {
         font-size: 1.75rem;
         font-weight: 700;
@@ -89,7 +69,6 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Badge de status */
     .status-badge {
         display: inline-block;
         padding: 0.5rem 1.25rem;
@@ -115,35 +94,75 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
     }
     
-    /* Seções */
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin: 2rem 0 1rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 3px solid #f97316;
-    }
-    
-    /* Cards de análise */
-    .analysis-card {
-        background: white;
-        border-radius: 10px;
+    .info-box {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         padding: 1.5rem;
-        margin-bottom: 1rem;
-        border-left: 4px solid #f97316;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .analysis-card-aprovado {
-        background: #f0fdf4;
-        border-left-color: #10b981;
-    }
-    .analysis-card-reprovado {
-        background: #fef2f2;
-        border-left-color: #ef4444;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        border: 1px solid #e2e8f0;
     }
     
-    /* Botões */
+    /* NOVO: Seção de arquivos com layout horizontal */
+    .files-section {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        border: 2px solid #3b82f6;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    }
+    .files-section h4 {
+        color: #1e3a8a;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* NOVO: Linha de arquivo com nome + botão */
+    .file-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        border: 1px solid #bfdbfe;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .file-name {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 1.05rem;
+    }
+    .file-icon {
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+    
+    /* NOVO: Botão de download */
+    .download-btn {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white !important;
+        padding: 0.6rem 1.25rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(59, 130, 246, 0.4);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    }
+    
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
@@ -172,7 +191,6 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
     }
     
-    /* Formulário */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -187,7 +205,6 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
-    /* Expander */
     .stExpander {
         border: 1px solid #e5e7eb;
         border-radius: 12px;
@@ -196,59 +213,11 @@ st.markdown("""
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
     
-    /* CORREÇÃO: Info box mais suave (não tão amarelo gritante) */
-    .info-box {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        font-size: 1.1rem;
-        border: 1px solid #e2e8f0;
-    }
-    
-    /* CORREÇÃO: Seção de arquivos mais destacada */
-    .files-section {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        padding: 2rem;
-        border-radius: 12px;
-        margin: 1.5rem 0;
-        border: 2px solid #3b82f6;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
-    }
-    .files-section h4 {
-        color: #1e3a8a;
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-    
-    /* Botões de download mais visíveis */
-    .file-download-btn {
-        display: inline-block;
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white !important;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        text-decoration: none;
-        margin: 0.5rem;
-        font-weight: 600;
-        font-size: 1rem;
-        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-        transition: all 0.3s ease;
-    }
-    .file-download-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
-    }
-    
-    /* Labels do formulário */
     label {
         font-size: 1.1rem;
         font-weight: 600;
         color: #374151;
     }
-    
-    /* Títulos de seção do formulário */
     h3, h4 {
         font-size: 1.5rem;
         font-weight: 700;
@@ -269,7 +238,6 @@ def encontrar_tabela(nome_tabela):
     return None
 
 def encontrar_coluna_title(props):
-    """Encontra a coluna do tipo Title (primeira coluna obrigatória)"""
     for prop_name, prop_info in props.items():
         if prop_info.get("type") == "title":
             return prop_name
@@ -291,7 +259,6 @@ def get_status_safe(props, coluna_nome):
     return "Desconhecido"
 
 def get_titulo_safe(props, coluna_nome):
-    """Busca o título da coluna Title"""
     if coluna_nome and coluna_nome in props:
         col = props[coluna_nome]
         if col and isinstance(col, dict):
@@ -342,7 +309,8 @@ with st.sidebar:
             lista_projetos = []
             for proj in projetos:
                 props = proj.get("properties", {})
-                nome_proj = get_titulo_safe(props, encontrar_coluna_title(props))
+                col_titulo = encontrar_coluna_title(props)
+                nome_proj = get_titulo_safe(props, col_titulo)
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
             st.markdown("**📁 Projetos**")
@@ -363,7 +331,6 @@ with st.sidebar:
 
 # --- ÁREA PRINCIPAL ---
 if 'projeto_escolhido' in dir() and projeto_escolhido:
-    # Cabeçalho com título fixo
     st.markdown(f"""
     <div class="header">
         <h1>🏛️ Compliance Tributário</h1>
@@ -384,11 +351,9 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
         if not cenarios:
             st.info("📭 Nenhum cenário encontrado para este projeto.")
         else:
-            # Descobrir colunas da tabela Análises
             db_info = notion.databases.retrieve(database_id=id_analises)
             todas_props = db_info.get("properties", {})
             
-            # **IMPORTANTE:** Encontra a coluna Title (primeira coluna obrigatória)
             coluna_titulo_analise = encontrar_coluna_title(todas_props)
             
             nomes_colunas = {
@@ -408,13 +373,13 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     col_relation = prop_name
                     break
             
-            # Lista de cenários
-            st.markdown("## 📋 Cenários")
+            st.markdown("##  Cenários")
             
             for cenario in cenarios:
                 props = cenario.get("properties", {})
                 
-                nome_cenario = get_titulo_safe(props, encontrar_coluna_title(props))
+                col_titulo_cenario = encontrar_coluna_title(props)
+                nome_cenario = get_titulo_safe(props, col_titulo_cenario)
                 status = get_status_safe(props, "Status")
                 responsavel = get_people_safe(props, "Responsável")
                 
@@ -428,7 +393,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif arquivo.get("file", {}).get("url"):
                                 anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
                 
-                # Classe do card baseada no status
                 card_class = "scenario-card"
                 if status == "Aprovado":
                     card_class += " scenario-card-aprovado"
@@ -436,62 +400,61 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     card_class += " scenario-card-reprovado"
                 
                 with st.expander(f"📄 {nome_cenario}", expanded=False):
-                    # Informações do cenário
                     st.markdown(f"""
                     <div class="{card_class}">
                         <div class="scenario-title">{nome_cenario}</div>
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # Badge de status
                     if status == "Aprovado":
                         st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
                     elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado"> REPROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
                     else:
                         st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
                     
                     st.markdown("---")
                     
-                    # CORREÇÃO: Info box mais suave
                     st.markdown(f"""
                     <div class="info-box">
                         <strong>👤 Responsável:</strong> {responsavel}<br><br>
-                        <strong> Status:</strong> {status}
+                        <strong>📊 Status:</strong> {status}
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # CORREÇÃO: Seção de arquivos mais destacada
+                    # NOVO: Seção de arquivos com nome + botão de download ao lado
                     if anexos:
                         st.markdown(f"""
                         <div class="files-section">
-                            <h4> Arquivos para Download ({len(anexos)})</h4>
+                            <h4>📎 Arquivos Disponíveis ({len(anexos)})</h4>
                         </div>
                         """, unsafe_allow_html=True)
                         
-                        # Botões de download mais visíveis
-                        col_files = st.columns(min(len(anexos), 3))
-                        for idx, arquivo in enumerate(anexos):
-                            with col_files[idx % len(col_files)]:
-                                st.markdown(f"""
-                                <a href="{arquivo['url']}" target="_blank" class="file-download-btn">
-                                    📥 {arquivo['nome'][:30]}{'...' if len(arquivo['nome']) > 30 else ''}
+                        for arquivo in anexos:
+                            st.markdown(f"""
+                            <div class="file-row">
+                                <div class="file-name">
+                                    <span class="file-icon">📄</span>
+                                    {arquivo['nome']}
+                                </div>
+                                <a href="{arquivo['url']}" target="_blank" download class="download-btn">
+                                    ⬇️ Baixar
                                 </a>
-                                """, unsafe_allow_html=True)
+                            </div>
+                            """, unsafe_allow_html=True)
                     else:
-                        st.info("📭 Nenhum arquivo disponível")
+                        st.info(" Nenhum arquivo disponível")
                     
                     st.markdown("---")
                     
                     # --- FORMULÁRIO PARA NOVA ANÁLISE ---
-                    st.markdown("### 📝 Registrar Nova Análise")
+                    st.markdown("###  Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
                         
                         with col_f1:
-                            # **IMPORTANTE:** O campo "Nome da Análise" vai para a coluna Title
-                            nome_input = st.text_input("Nome da Análise / Analista", placeholder="Ex: João Silva - Contabilidade")
+                            nome_input = st.text_input("Analista Responsável", placeholder="Ex: João Silva")
                             setor_input = st.selectbox(
                                 "Setor",
                                 options=["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
@@ -520,7 +483,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                     
                                     propriedades = {}
                                     
-                                    # **IMPORTANTE:** Salva na coluna Title (que é "Analista Responsável")
                                     if coluna_titulo_analise:
                                         propriedades[coluna_titulo_analise] = {"title": [{"text": {"content": nome_input}}]}
                                     
@@ -568,4 +530,4 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 st.rerun()
     
     except Exception as e:
-        st.error(f"❌ Erro: {e}")
+        st.error(f" Erro: {e}")
