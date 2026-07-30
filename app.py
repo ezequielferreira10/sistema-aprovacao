@@ -5,7 +5,7 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
 
 # --- CSS PERSONALIZADO ---
 st.markdown("""
@@ -268,6 +268,13 @@ def encontrar_tabela(nome_tabela):
         return resultados[0]["id"]
     return None
 
+def encontrar_coluna_title(props):
+    """Encontra a coluna do tipo Title (primeira coluna obrigatória)"""
+    for prop_name, prop_info in props.items():
+        if prop_info.get("type") == "title":
+            return prop_name
+    return None
+
 def encontrar_coluna(props, nomes_possiveis):
     for nome in nomes_possiveis:
         if nome in props:
@@ -283,14 +290,14 @@ def get_status_safe(props, coluna_nome):
                 return select.get("name", "Desconhecido")
     return "Desconhecido"
 
-def get_titulo_safe(props, nomes_possiveis):
-    for nome in nomes_possiveis:
-        if nome in props:
-            col = props[nome]
-            if col and isinstance(col, dict):
-                titulos = col.get("title", [])
-                if titulos and len(titulos) > 0:
-                    return titulos[0].get("plain_text", "Sem nome")
+def get_titulo_safe(props, coluna_nome):
+    """Busca o título da coluna Title"""
+    if coluna_nome and coluna_nome in props:
+        col = props[coluna_nome]
+        if col and isinstance(col, dict):
+            titulos = col.get("title", [])
+            if titulos and len(titulos) > 0:
+                return titulos[0].get("plain_text", "Sem nome")
     return "Sem nome"
 
 def get_texto_safe(props, coluna_nome):
@@ -335,7 +342,7 @@ with st.sidebar:
             lista_projetos = []
             for proj in projetos:
                 props = proj.get("properties", {})
-                nome_proj = get_titulo_safe(props, ["Projeto", "Nome", "Name"])
+                nome_proj = get_titulo_safe(props, encontrar_coluna_title(props))
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
             st.markdown("**📁 Projetos**")
@@ -381,10 +388,11 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
             db_info = notion.databases.retrieve(database_id=id_analises)
             todas_props = db_info.get("properties", {})
             
+            # **IMPORTANTE:** Encontra a coluna Title (primeira coluna obrigatória)
+            coluna_titulo_analise = encontrar_coluna_title(todas_props)
+            
             nomes_colunas = {
-                "nome_analise": ["Nome da Análise", "Nome da Analise", "Nome", "Name"],
                 "setor": ["Setor", "Área", "Area", "Departamento"],
-                "analista": ["Analista Responsável", "Analista Responsavel", "Analista", "Responsável"],
                 "status": ["Status", "Situação", "Situacao"],
                 "motivo": ["Motivo", "Motivo da Reprovação", "Observação", "Comentario"],
                 "data": ["Data", "Date", "Data da Análise"]
@@ -406,7 +414,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
             for cenario in cenarios:
                 props = cenario.get("properties", {})
                 
-                nome_cenario = get_titulo_safe(props, ["Cenário", "Cenario", "Nome", "Name"])
+                nome_cenario = get_titulo_safe(props, encontrar_coluna_title(props))
                 status = get_status_safe(props, "Status")
                 responsavel = get_people_safe(props, "Responsável")
                 
@@ -439,7 +447,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if status == "Aprovado":
                         st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
                     elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-reprovado"> REPROVADO</span>', unsafe_allow_html=True)
                     else:
                         st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
                     
@@ -457,7 +465,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if anexos:
                         st.markdown(f"""
                         <div class="files-section">
-                            <h4>📎 Arquivos para Download ({len(anexos)})</h4>
+                            <h4> Arquivos para Download ({len(anexos)})</h4>
                         </div>
                         """, unsafe_allow_html=True)
                         
@@ -476,18 +484,18 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     st.markdown("---")
                     
                     # --- FORMULÁRIO PARA NOVA ANÁLISE ---
-                    st.markdown("###  Registrar Nova Análise")
+                    st.markdown("### 📝 Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
                         
                         with col_f1:
-                            nome_input = st.text_input("Nome da Análise", placeholder="Ex: Análise Contábil")
+                            # **IMPORTANTE:** O campo "Nome da Análise" vai para a coluna Title
+                            nome_input = st.text_input("Nome da Análise / Analista", placeholder="Ex: João Silva - Contabilidade")
                             setor_input = st.selectbox(
                                 "Setor",
                                 options=["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
                             )
-                            analista_input = st.text_input("Nome do Analista", placeholder="Ex: João Silva")
                         
                         with col_f2:
                             status_input = st.selectbox(
@@ -503,8 +511,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         
                         if submit:
                             if not nome_input:
-                                st.error("❌ Preencha o nome da análise.")
-                            elif not analista_input:
                                 st.error("❌ Preencha o nome do analista.")
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("❌ Informe o motivo da reprovação.")
@@ -513,12 +519,13 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                     data_hoje = datetime.now().strftime("%Y-%m-%d")
                                     
                                     propriedades = {}
-                                    if colunas_reais.get("nome_analise"):
-                                        propriedades[colunas_reais["nome_analise"]] = {"title": [{"text": {"content": nome_input}}]}
+                                    
+                                    # **IMPORTANTE:** Salva na coluna Title (que é "Analista Responsável")
+                                    if coluna_titulo_analise:
+                                        propriedades[coluna_titulo_analise] = {"title": [{"text": {"content": nome_input}}]}
+                                    
                                     if colunas_reais.get("setor"):
                                         propriedades[colunas_reais["setor"]] = {"select": {"name": setor_input}}
-                                    if colunas_reais.get("analista"):
-                                        propriedades[colunas_reais["analista"]] = {"rich_text": [{"text": {"content": analista_input}}]}
                                     if colunas_reais.get("status"):
                                         propriedades[colunas_reais["status"]] = {"select": {"name": status_input}}
                                     if colunas_reais.get("motivo"):
@@ -529,7 +536,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                         propriedades[col_relation] = {"relation": [{"id": cenario["id"]}]}
                                     
                                     notion.pages.create(parent={"database_id": id_analises}, properties=propriedades)
-                                    st.success(f"✅ Análise '{nome_input}' salva com sucesso!")
+                                    st.success(f"✅ Análise de '{nome_input}' salva com sucesso!")
                                     st.rerun()
                                 except Exception as e:
                                     st.error(f"❌ Erro ao salvar: {e}")
