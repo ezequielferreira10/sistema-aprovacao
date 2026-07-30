@@ -6,9 +6,9 @@ import ssl
 
 NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
 
-# --- CSS PERSONALIZADO ---
+# --- CSS PERSONALIZADO (Cores padronizadas: Azul #0A5AA5 e Laranja #FF6C12) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -72,7 +72,7 @@ st.markdown("""
         border-left: 6px solid #FF6C12;
     }
     .scenario-card-aprovado { border-left-color: #0A5AA5; }
-    .scenario-card-reprovado { border-left-color: #000000; }
+    .scenario-card-reprovado { border-left-color: #FF6C12; }
     
     .scenario-title {
         font-size: 1.8rem;
@@ -91,9 +91,19 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .status-aprovado { background: #0A5AA5; color: white; }
-    .status-reprovado { background: #000000; color: white; }
-    .status-pendente { background: #FF6C12; color: white; }
+    .status-aprovado { 
+        background: #0A5AA5; 
+        color: white; 
+    }
+    .status-reprovado { 
+        background: #FF6C12; 
+        color: white; 
+    }
+    .status-pendente { 
+        background: #f1f5f9; 
+        color: #0A5AA5;
+        border: 2px solid #0A5AA5;
+    }
     
     /* Info box */
     .info-box {
@@ -105,7 +115,7 @@ st.markdown("""
         border: 1px solid #e5e7eb;
     }
     
-    /* Files section - mais discreta */
+    /* Files section */
     .files-section {
         margin: 1.5rem 0 0.5rem 0;
         padding: 0;
@@ -120,7 +130,7 @@ st.markdown("""
         display: inline-block;
     }
     
-    /* File row - nome e botão na mesma linha */
+    /* File row */
     .file-row {
         display: flex;
         justify-content: space-between;
@@ -152,51 +162,47 @@ st.markdown("""
         margin-right: 0.5rem;
     }
     
-    /* Botão de download compacto */
-    .file-download-btn {
-        background: #0A5AA5;
-        color: white !important;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.875rem;
-        white-space: nowrap;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-    .file-download-btn:hover {
-        background: #084a8a;
-        transform: translateY(-1px);
-    }
-    
-    /* Streamlit buttons */
+    /* Streamlit buttons - PADRONIZADOS */
     .stButton > button {
         border-radius: 10px;
-        font-weight: 700;
+        font-weight: 600;
         font-size: 1rem;
         padding: 0.75rem 1.5rem;
         transition: all 0.3s ease;
     }
+    
+    /* Botão primário (Aprovar, Salvar) - Azul outline */
     .stButton > button[kind="primary"] {
-        background: #0A5AA5;
-        color: white;
-        border: none;
+        background: white;
+        color: #0A5AA5;
+        border: 2px solid #0A5AA5;
     }
     .stButton > button[kind="primary"]:hover {
-        background: #084a8a;
-    }
-    .stButton > button[kind="secondary"] {
-        background: #FF6C12;
+        background: #0A5AA5;
         color: white;
-        border: none;
+    }
+    
+    /* Botão secundário (Reprovar, Download) - Laranja outline */
+    .stButton > button[kind="secondary"] {
+        background: white;
+        color: #FF6C12;
+        border: 2px solid #FF6C12;
     }
     .stButton > button[kind="secondary"]:hover {
-        background: #e55f0f;
+        background: #FF6C12;
+        color: white;
+    }
+    
+    /* Botão tertiary (ghost) - Cinza outline */
+    .stButton > button[kind="tertiary"] {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+    }
+    .stButton > button[kind="tertiary"]:hover {
+        background: #f1f5f9;
+        border-color: #0A5AA5;
+        color: #0A5AA5;
     }
     
     /* Form inputs */
@@ -233,6 +239,15 @@ st.markdown("""
         font-size: 1.4rem;
         font-weight: 700;
         color: #000000;
+    }
+    
+    /* Seção de decisão final */
+    .decision-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        border: 2px solid #e5e7eb;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -391,7 +406,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
         cenarios = cenarios_response.get("results", [])
         
         if not cenarios:
-            st.info("📭 Nenhum cenário encontrado para este projeto.")
+            st.info(" Nenhum cenário encontrado para este projeto.")
         else:
             todas_props = db_info_analises.get("properties", {})
             
@@ -458,7 +473,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if status == "Aprovado":
                         st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
                     elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado"> REPROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
                     else:
                         st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
                     
@@ -471,7 +486,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # SEÇÃO DE ANEXOS - NOME E BOTÃO NA MESMA LINHA
+                    # SEÇÃO DE ANEXOS
                     if anexos:
                         titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
                         
@@ -485,7 +500,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             conteudo = baixar_arquivo_notion(arquivo['url'])
                             
                             if conteudo:
-                                # Nome à esquerda, botão à direita
                                 col_nome, col_btn = st.columns([4, 1])
                                 
                                 with col_nome:
@@ -502,15 +516,14 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                         file_name=arquivo['nome'],
                                         mime="application/octet-stream",
                                         key=f"download_{cenario['id']}_{idx}",
-                                        type="primary",
+                                        type="tertiary",
                                         use_container_width=True
                                     )
                             else:
-                                # Fallback: link direto
                                 st.markdown(f"""
                                 <div class="file-row">
                                     <div class="file-name">{arquivo['nome']}</div>
-                                    <a href="{arquivo['url']}" target="_blank" class="file-download-btn">
+                                    <a href="{arquivo['url']}" target="_blank" style="background: white; color: #FF6C12; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid #FF6C12; display: inline-block;">
                                         🔗 Abrir
                                     </a>
                                 </div>
@@ -557,7 +570,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif not setor_input:
                                 st.error("❌ Selecione o setor.")
                             elif not status_input:
-                                st.error("❌ Selecione o status.")
+                                st.error(" Selecione o status.")
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("❌ Informe o motivo da reprovação.")
                             else:
@@ -595,7 +608,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         
                         col_ap, col_rp = st.columns(2)
                         with col_ap:
-                            if st.button("✅ APROVAR CENÁRIO", type="primary", use_container_width=True, key=f"ap_{cenario['id']}"):
+                            if st.button("✅ Aprovar Cenário", type="primary", use_container_width=True, key=f"ap_{cenario['id']}"):
                                 notion.pages.update(
                                     page_id=cenario["id"],
                                     properties={"Status": {"select": {"name": "Aprovado"}}}
@@ -604,7 +617,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 st.success("🎉 Cenário Aprovado com sucesso!")
                                 st.rerun()
                         with col_rp:
-                            if st.button("❌ REPROVAR CENÁRIO", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
+                            if st.button("❌ Reprovar Cenário", type="secondary", use_container_width=True, key=f"rp_{cenario['id']}"):
                                 notion.pages.update(
                                     page_id=cenario["id"],
                                     properties={"Status": {"select": {"name": "Reprovado"}}}
