@@ -5,7 +5,7 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Sistema de Aprovação", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Sistema de Aprovação", page_icon="️", layout="wide")
 st.title("🏛️ Sistema de Aprovação - Compliance Tributário")
 st.markdown("---")
 
@@ -22,14 +22,13 @@ def encontrar_tabela(nome_tabela):
         return resultados[0]["id"]
     return None
 
-# --- Buscar nome real da coluna (tenta variações) ---
+# --- Buscar nome real da coluna ---
 def encontrar_coluna(props, nomes_possiveis):
     for nome in nomes_possiveis:
         if nome in props:
             return nome
     return None
 
-# Encontra os IDs das tabelas
 id_projetos = encontrar_tabela("Projetos")
 id_cenarios = encontrar_tabela("Cenário")
 id_analises = encontrar_tabela("Análises")
@@ -46,7 +45,6 @@ if not id_analises:
     st.error("❌ Tabela 'Análises' não encontrada.")
     st.stop()
 
-# --- SIDEBAR ---
 st.sidebar.title("📁 Projetos")
 
 try:
@@ -90,39 +88,41 @@ try:
             else:
                 st.success(f"✅ Encontrados **{len(cenarios)}** cenário(s)")
                 
-                # Primeiro, descobrir os nomes reais das colunas da tabela Análises
-                # (fazemos isso uma vez só, pegando a primeira análise existente ou criando uma de teste)
-                analises_teste = notion.databases.query(
-                    database_id=id_analises,
-                    page_size=1
-                )
+                # --- DESCOBRIR NOMES DAS COLUNAS DA TABELA ANÁLISES ---
+                db_info = notion.databases.retrieve(database_id=id_analises)
+                todas_props = db_info.get("properties", {})
                 
                 # Nomes possíveis para cada coluna
                 nomes_colunas = {
                     "nome_analise": ["Nome da Análise", "Nome da Analise", "Nome", "Name", "Título", "Titulo"],
                     "setor": ["Setor", "Área", "Area", "Departamento"],
-                    "analista": ["Analista Responsável", "Analista Responsavel", "Analista", "Responsável", "Responsavel", "Analista responsável"],
+                    "analista": ["Analista Responsável", "Analista Responsavel", "Analista", "Responsável", "Responsavel", "Analista responsável", "Analista responsavel"],
                     "status": ["Status", "Situação", "Situacao"],
                     "motivo": ["Motivo", "Motivo da Reprovação", "Observação", "Observacao", "Comentário", "Comentario"],
                     "data": ["Data", "Date", "Data da Análise"]
                 }
                 
-                # Se tiver análise existente, usa ela para descobrir os nomes
+                # Descobre os nomes reais
                 colunas_reais = {}
-                if analises_teste.get("results"):
-                    props_teste = analises_teste["results"][0]["properties"]
-                    for chave, possiveis in nomes_colunas.items():
-                        colunas_reais[chave] = encontrar_coluna(props_teste, possiveis)
-                else:
-                    # Se não tiver análise, busca as propriedades do banco
-                    db_info = notion.databases.retrieve(database_id=id_analises)
-                    props_db = db_info.get("properties", {})
-                    for chave, possiveis in nomes_colunas.items():
-                        colunas_reais[chave] = encontrar_coluna(props_db, possiveis)
+                for chave, possiveis in nomes_colunas.items():
+                    colunas_reais[chave] = encontrar_coluna(todas_props, possiveis)
                 
-                # Mostra os nomes detectados (para debug)
+                # **IMPORTANTE:** Encontra a coluna do tipo RELATION (que vincula com Cenário)
+                col_relation = None
+                for prop_name, prop_info in todas_props.items():
+                    if prop_info.get("type") == "relation":
+                        col_relation = prop_name
+                        break
+                
+                # Mostra debug
                 with st.expander("🔍 Nomes das colunas detectados (debug)"):
                     st.write(colunas_reais)
+                    st.write(f"**Coluna de Relation encontrada:** {col_relation}")
+                
+                if not col_relation:
+                    st.error("❌ Não foi encontrada uma coluna do tipo 'Relation' na tabela Análises!")
+                    st.info(" Verifique se você criou a coluna que vincula com a tabela Cenário.")
+                    st.stop()
                 
                 for cenario in cenarios:
                     props = cenario["properties"]
@@ -152,7 +152,7 @@ try:
                             elif arquivo.get("file", {}).get("url"):
                                 anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
                     
-                    with st.expander(f" {nome_cenario} - {status}", expanded=False):
+                    with st.expander(f"📄 {nome_cenario} - {status}", expanded=False):
                         col1, col2 = st.columns(2)
                         with col1:
                             st.write(f"**Responsável:** {responsavel}")
@@ -163,34 +163,23 @@ try:
                                 for arquivo in anexos:
                                     st.link_button(f"📥 {arquivo['nome']}", arquivo['url'])
                             else:
-                                st.warning("️ Sem arquivos")
+                                st.warning("⚠️ Sem arquivos")
                         
                         st.markdown("---")
                         
                         # --- ANÁLISES EXISTENTES ---
                         st.subheader("📊 Análises por Setor")
                         
+                        # Busca análises usando a coluna de RELATION correta
                         analises_response = notion.databases.query(
                             database_id=id_analises,
                             filter={
-                                "property": colunas_reais.get("nome_analise") or "Cenário",
+                                "property": col_relation,  # Usa a coluna de relation que encontramos!
                                 "relation": {"contains": cenario["id"]}
                             }
                         )
                         
-                        # Tenta com a coluna "Cenário" (relation) se não achar
-                        if not analises_response.get("results"):
-                            # Busca todas as análises e filtra manualmente
-                            todas_analises = notion.databases.query(database_id=id_analises)
-                            analises = [
-                                a for a in todas_analises.get("results", [])
-                                if cenario["id"] in [
-                                    r.get("id") 
-                                    for r in a["properties"].get(colunas_reais.get("nome_analise") or "Cenário", {}).get("relation", [])
-                                ]
-                            ]
-                        else:
-                            analises = analises_response.get("results", [])
+                        analises = analises_response.get("results", [])
                         
                         if analises:
                             for analise in analises:
@@ -241,13 +230,13 @@ try:
                                 if col_data and col_data in a_props and a_props[col_data].get("date"):
                                     data_analise = a_props[col_data]["date"].get("start", "")
                                 
-                                cor_status = "" if status_analise == "Aprovado" else "🔴" if status_analise == "Reprovado" else "🟡"
+                                cor_status = "🟢" if status_analise == "Aprovado" else "🔴" if status_analise == "Reprovado" else "🟡"
                                 
                                 with st.container(border=True):
                                     col_a1, col_a2 = st.columns([3, 1])
                                     with col_a1:
                                         st.write(f"**{nome_analise}**")
-                                        st.write(f"🏢 **Setor:** {setor}")
+                                        st.write(f" **Setor:** {setor}")
                                         st.write(f"👤 **Analista:** {analista}")
                                         if motivo:
                                             st.write(f"📝 **Motivo:** {motivo}")
@@ -257,12 +246,12 @@ try:
                                         st.write(f"{cor_status} **{status_analise}**")
                                     st.markdown("---")
                         else:
-                            st.info("📭 Nenhuma análise registrada ainda.")
+                            st.info(" Nenhuma análise registrada ainda.")
                         
                         st.markdown("---")
                         
                         # --- FORMULÁRIO PARA NOVA ANÁLISE ---
-                        st.subheader(" Registrar Nova Análise")
+                        st.subheader("➕ Registrar Nova Análise")
                         
                         with st.form(key=f"form_analise_{cenario['id']}"):
                             col_form1, col_form2 = st.columns(2)
@@ -298,47 +287,43 @@ try:
                                     try:
                                         data_hoje = datetime.now().strftime("%Y-%m-%d")
                                         
-                                        # Monta as propriedades dinamicamente com os nomes reais das colunas
-                                        propriedades = {
-                                            colunas_reais["nome_analise"]: {
+                                        # Monta propriedades
+                                        propriedades = {}
+                                        
+                                        if colunas_reais.get("nome_analise"):
+                                            propriedades[colunas_reais["nome_analise"]] = {
                                                 "title": [{"text": {"content": nome_analise_input}}]
-                                            },
-                                            colunas_reais["setor"]: {
+                                            }
+                                        
+                                        if colunas_reais.get("setor"):
+                                            propriedades[colunas_reais["setor"]] = {
                                                 "select": {"name": setor_input}
-                                            },
-                                            colunas_reais["analista"]: {
+                                            }
+                                        
+                                        if colunas_reais.get("analista"):
+                                            propriedades[colunas_reais["analista"]] = {
                                                 "rich_text": [{"text": {"content": analista_input}}]
-                                            },
-                                            colunas_reais["status"]: {
+                                            }
+                                        
+                                        if colunas_reais.get("status"):
+                                            propriedades[colunas_reais["status"]] = {
                                                 "select": {"name": status_analise_input}
-                                            },
-                                            colunas_reais["motivo"]: {
+                                            }
+                                        
+                                        if colunas_reais.get("motivo"):
+                                            propriedades[colunas_reais["motivo"]] = {
                                                 "rich_text": [{"text": {"content": motivo_input}}] if motivo_input else []
-                                            },
-                                            colunas_reais["data"]: {
+                                            }
+                                        
+                                        if colunas_reais.get("data"):
+                                            propriedades[colunas_reais["data"]] = {
                                                 "date": {"start": data_hoje}
                                             }
+                                        
+                                        # Adiciona a RELATION (coluna que vincula com o cenário)
+                                        propriedades[col_relation] = {
+                                            "relation": [{"id": cenario["id"]}]
                                         }
-                                        
-                                        # Adiciona a relação com o cenário (usando a coluna de relation)
-                                        # A coluna de relation pode ter nome diferente - vamos tentar
-                                        col_relation = None
-                                        for nome_possivel in ["Cenário", "Cenario", "Cenário 2", "Cenario 2", "Cenário Vinculado"]:
-                                            if nome_possivel in colunas_reais.values() or nome_possivel in a_props if 'a_props' in dir() else False:
-                                                col_relation = nome_possivel
-                                                break
-                                        
-                                        # Busca a coluna de relation no banco
-                                        db_info = notion.databases.retrieve(database_id=id_analises)
-                                        for prop_name, prop_info in db_info.get("properties", {}).items():
-                                            if prop_info.get("type") == "relation":
-                                                col_relation = prop_name
-                                                break
-                                        
-                                        if col_relation:
-                                            propriedades[col_relation] = {
-                                                "relation": [{"id": cenario["id"]}]
-                                            }
                                         
                                         nova_analise = notion.pages.create(
                                             parent={"database_id": id_analises},
@@ -350,6 +335,7 @@ try:
                                         
                                     except Exception as e:
                                         st.error(f"❌ Erro ao salvar análise: {str(e)}")
+                                        st.info(f"💡 Detalhes: Verifique se todas as colunas existem na tabela Análises")
                         
                         st.markdown("---")
                         
@@ -378,3 +364,5 @@ try:
         
 except Exception as e:
     st.error(f"❌ Erro: {str(e)}")
+    import traceback
+    st.code(traceback.format_exc())
