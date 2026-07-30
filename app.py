@@ -1,9 +1,8 @@
 import streamlit as st
 from notion_client import Client
 from datetime import datetime
-
-# --- CONFIGURAÇÕES ---
-NOTION_TOKEN = "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"
+import urllib.request
+import ssl
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
@@ -29,9 +28,6 @@ st.markdown("""
         background-color: white !important;
     }
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
-        color: #000000 !important;
-    }
-    [data-testid="stSidebar"] .stSelectbox > div > div > div > div > div {
         color: #000000 !important;
     }
     
@@ -133,19 +129,11 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 0.75rem;
         border: 1px solid #e5e7eb;
-        transition: all 0.2s ease;
-    }
-    .file-row:hover {
-        background: #f0f4f8;
-        border-color: #0A5AA5;
     }
     .file-name {
         font-weight: 600;
         color: #000000;
         font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
     }
     
     /* Streamlit buttons */
@@ -270,17 +258,23 @@ def get_people_safe(props, coluna_nome):
                 return pessoas[0].get("name", "Não definido")
     return "Não definido"
 
-def baixar_arquivo(url):
-    """Baixa o arquivo com headers de navegador"""
+def baixar_arquivo_notion(url):
+    """Baixa arquivo do Notion com tratamento de SSL e headers"""
     try:
+        # Ignora verificação SSL para URLs do Notion
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
         req = urllib.request.Request(
             url,
             headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Accept': '*/*',
+                'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
             }
         )
-        with urllib.request.urlopen(req, timeout=30) as response:
+        with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
             return response.read()
     except Exception as e:
         return None
@@ -309,7 +303,7 @@ db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("### ️ Compliance Tributário")
+    st.markdown("### 🏛️ Compliance Tributário")
     st.markdown("---")
     
     try:
@@ -324,7 +318,7 @@ with st.sidebar:
                 nome_proj = get_titulo_safe(props, col_titulo)
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
-            st.markdown("** Projetos**")
+            st.markdown("**📁 Projetos**")
             projeto_escolhido = st.selectbox(
                 "Selecione o projeto:",
                 options=lista_projetos,
@@ -401,7 +395,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                 status = get_status_safe(props, "Status")
                 responsavel = get_people_safe(props, "Responsável")
                 
-                # DEFINIR ANEXOS AQUI (dentro do loop)
                 anexos = []
                 if "Anexos" in props:
                     arquivos = props["Anexos"].get("files", [])
@@ -418,7 +411,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                 elif status == "Reprovado":
                     card_class += " scenario-card-reprovado"
                 
-                with st.expander(f" {nome_cenario}", expanded=False):
+                with st.expander(f"📄 {nome_cenario}", expanded=False):
                     st.markdown(f"""
                     <div class="{card_class}">
                         <div class="scenario-title">{nome_cenario}</div>
@@ -430,18 +423,18 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     elif status == "Reprovado":
                         st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
                     else:
-                        st.markdown('<span class="status-badge status-pendente"> PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
                     
                     st.markdown("---")
                     
                     st.markdown(f"""
                     <div class="info-box">
-                        <strong> Responsável:</strong> {responsavel}<br><br>
+                        <strong>👤 Responsável:</strong> {responsavel}<br><br>
                         <strong>📊 Status:</strong> {status}
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # SEÇÃO DE ANEXOS
+                    # SEÇÃO DE ANEXOS COM DOWNLOAD FUNCIONAL
                     if anexos:
                         titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
                         
@@ -460,9 +453,11 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             </div>
                             """, unsafe_allow_html=True)
                             
-                            conteudo = baixar_arquivo(arquivo['url'])
+                            # Tenta baixar o arquivo
+                            conteudo = baixar_arquivo_notion(arquivo['url'])
                             
                             if conteudo:
+                                # Botão de download funcional
                                 st.download_button(
                                     label="⬇️ Baixar Arquivo",
                                     data=conteudo,
@@ -473,20 +468,21 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                     use_container_width=True
                                 )
                             else:
+                                # Fallback: link direto
                                 st.markdown(f"""
-                                <a href="{arquivo['url']}" style="background: #FF6C12; color: white; padding: 0.75rem 1.5rem; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-block;">
+                                <a href="{arquivo['url']}" target="_blank" style="background: #FF6C12; color: white; padding: 0.75rem 1.5rem; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-block;">
                                     🔗 Abrir Arquivo
                                 </a>
                                 """, unsafe_allow_html=True)
                             
-                            st.markdown("<div style='margin-bottom: 0.75rem;'></div>", unsafe_allow_html=True)
+                            st.markdown("<div style='margin-bottom: 1rem;'></div>", unsafe_allow_html=True)
                     else:
                         st.info("📭 Nenhum anexo disponível")
                     
                     st.markdown("---")
                     
                     # FORMULÁRIO
-                    st.markdown("###  Registrar Nova Análise")
+                    st.markdown("### 📝 Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
@@ -520,7 +516,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif not setor_input:
                                 st.error("❌ Selecione o setor.")
                             elif not status_input:
-                                st.error(" Selecione o status.")
+                                st.error("❌ Selecione o status.")
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("❌ Informe o motivo da reprovação.")
                             else:
@@ -576,4 +572,4 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 st.rerun()
     
     except Exception as e:
-        st.error(f"❌ Erro: {e}")
+        st.error(f" Erro: {e}")
