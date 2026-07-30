@@ -11,7 +11,6 @@ st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", lay
 # --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
-    /* Reset e base */
     * { box-sizing: border-box; }
     
     body {
@@ -19,7 +18,6 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
     
-    /* Sidebar */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
         padding: 2rem 1.5rem;
@@ -33,13 +31,11 @@ st.markdown("""
         color: #1f2937 !important;
     }
     
-    /* Main */
     .main {
         background-color: #f1f5f9;
         padding: 2rem 3rem;
     }
     
-    /* Header */
     .header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 3rem 2rem;
@@ -62,7 +58,6 @@ st.markdown("""
         font-weight: 500;
     }
     
-    /* Scenario card */
     .scenario-card {
         background: white;
         border-radius: 16px;
@@ -81,7 +76,6 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Status badge */
     .status-badge {
         display: inline-block;
         padding: 0.5rem 1.25rem;
@@ -91,20 +85,10 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .status-aprovado {
-        background: #10b981;
-        color: white;
-    }
-    .status-reprovado {
-        background: #ef4444;
-        color: white;
-    }
-    .status-pendente {
-        background: #f97316;
-        color: white;
-    }
+    .status-aprovado { background: #10b981; color: white; }
+    .status-reprovado { background: #ef4444; color: white; }
+    .status-pendente { background: #f97316; color: white; }
     
-    /* Info box */
     .info-box {
         background: #f8fafc;
         padding: 1.5rem;
@@ -114,7 +98,6 @@ st.markdown("""
         border: 1px solid #e2e8f0;
     }
     
-    /* Files section */
     .files-section {
         background: white;
         padding: 2rem;
@@ -130,7 +113,6 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     
-    /* File row */
     .file-row {
         display: flex;
         justify-content: space-between;
@@ -154,50 +136,7 @@ st.markdown("""
         align-items: center;
         gap: 0.75rem;
     }
-    .file-icon {
-        font-size: 1.3rem;
-    }
     
-    /* Download button */
-    .download-btn {
-        background: #3b82f6;
-        color: white !important;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        border: none;
-        cursor: pointer;
-    }
-    .download-btn:hover {
-        background: #2563eb;
-        transform: translateY(-1px);
-    }
-    
-    /* Form section */
-    .form-section {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin: 1.5rem 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    
-    /* Decision buttons */
-    .decision-section {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        margin: 1.5rem 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    
-    /* Streamlit buttons */
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
@@ -210,19 +149,14 @@ st.markdown("""
         color: white;
         border: none;
     }
-    .stButton > button[kind="primary"]:hover {
-        background: #059669;
-    }
+    .stButton > button[kind="primary"]:hover { background: #059669; }
     .stButton > button[kind="secondary"] {
         background: #ef4444;
         color: white;
         border: none;
     }
-    .stButton > button[kind="secondary"]:hover {
-        background: #dc2626;
-    }
+    .stButton > button[kind="secondary"]:hover { background: #dc2626; }
     
-    /* Form inputs */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -237,7 +171,6 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     
-    /* Expander */
     .stExpander {
         border: 1px solid #e2e8f0;
         border-radius: 12px;
@@ -322,9 +255,8 @@ def get_people_safe(props, coluna_nome):
 def baixar_arquivo(url):
     """Baixa o arquivo e retorna o conteúdo em bytes"""
     try:
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
-        return response.content
+        with urllib.request.urlopen(url, timeout=30) as response:
+            return response.read()
     except Exception as e:
         st.error(f"Erro ao baixar arquivo: {e}")
         return None
@@ -470,7 +402,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if anexos:
                         st.markdown(f"""
                         <div class="files-section">
-                            <h4>📎 Arquivos Disponíveis ({len(anexos)})</h4>
+                            <h4> Arquivos Disponíveis ({len(anexos)})</h4>
                         </div>
                         """, unsafe_allow_html=True)
                         
@@ -479,31 +411,30 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             conteudo = baixar_arquivo(arquivo['url'])
                             
                             if conteudo:
-                                # Cria linha do arquivo
-                                col_nome, col_btn = st.columns([3, 1])
+                                # Layout: nome à esquerda, botão à direita
+                                col_nome, col_btn = st.columns([4, 1])
                                 
                                 with col_nome:
                                     st.markdown(f"""
-                                    <div class="file-row">
+                                    <div class="file-row" style="margin-bottom: 0;">
                                         <div class="file-name">
-                                            <span class="file-icon">📄</span>
-                                            {arquivo['nome']}
+                                            📄 {arquivo['nome']}
                                         </div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                 
                                 with col_btn:
-                                    # Botão de download funcional
                                     st.download_button(
                                         label="⬇️ Baixar",
                                         data=conteudo,
                                         file_name=arquivo['nome'],
                                         mime="application/octet-stream",
                                         key=f"download_{cenario['id']}_{idx}",
-                                        type="primary"
+                                        type="primary",
+                                        use_container_width=True
                                     )
                     else:
-                        st.info("📭 Nenhum arquivo disponível")
+                        st.info(" Nenhum arquivo disponível")
                     
                     st.markdown("---")
                     
@@ -530,7 +461,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 placeholder="Explique o motivo da reprovação..."
                             )
                         
-                        submit = st.form_submit_button(" Salvar Análise", type="primary", use_container_width=True)
+                        submit = st.form_submit_button("💾 Salvar Análise", type="primary", use_container_width=True)
                         
                         if submit:
                             if not nome_input:
