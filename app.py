@@ -6,18 +6,16 @@ from datetime import datetime
 NOTION_TOKEN = "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"
 
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
 
 # --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
     * { box-sizing: border-box; }
-    
     body {
         background-color: #f1f5f9;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
-    
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
         padding: 2rem 1.5rem;
@@ -30,12 +28,10 @@ st.markdown("""
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
         color: #1f2937 !important;
     }
-    
     .main {
         background-color: #f1f5f9;
         padding: 2rem 3rem;
     }
-    
     .header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 3rem 2rem;
@@ -57,7 +53,6 @@ st.markdown("""
         margin: 0.75rem 0 0 0;
         font-weight: 500;
     }
-    
     .scenario-card {
         background: white;
         border-radius: 16px;
@@ -68,14 +63,12 @@ st.markdown("""
     }
     .scenario-card-aprovado { border-left-color: #10b981; }
     .scenario-card-reprovado { border-left-color: #ef4444; }
-    
     .scenario-title {
         font-size: 1.8rem;
         font-weight: 700;
         color: #1f2937;
         margin-bottom: 1rem;
     }
-    
     .status-badge {
         display: inline-block;
         padding: 0.5rem 1.25rem;
@@ -88,7 +81,6 @@ st.markdown("""
     .status-aprovado { background: #10b981; color: white; }
     .status-reprovado { background: #ef4444; color: white; }
     .status-pendente { background: #f97316; color: white; }
-    
     .info-box {
         background: #f8fafc;
         padding: 1.5rem;
@@ -97,7 +89,6 @@ st.markdown("""
         font-size: 1.05rem;
         border: 1px solid #e2e8f0;
     }
-    
     .files-section {
         background: white;
         padding: 2rem;
@@ -112,7 +103,6 @@ st.markdown("""
         font-weight: 700;
         margin-bottom: 1.5rem;
     }
-    
     .file-row {
         display: flex;
         justify-content: space-between;
@@ -136,7 +126,6 @@ st.markdown("""
         align-items: center;
         gap: 0.75rem;
     }
-    
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
@@ -156,7 +145,6 @@ st.markdown("""
         border: none;
     }
     .stButton > button[kind="secondary"]:hover { background: #dc2626; }
-    
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -170,7 +158,6 @@ st.markdown("""
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-    
     .stExpander {
         border: 1px solid #e2e8f0;
         border-radius: 12px;
@@ -178,13 +165,11 @@ st.markdown("""
         background: white;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
-    
     label {
         font-size: 1rem;
         font-weight: 600;
         color: #374151;
     }
-    
     h3, h4 {
         font-size: 1.4rem;
         font-weight: 700;
@@ -261,6 +246,17 @@ def baixar_arquivo(url):
         st.error(f"Erro ao baixar arquivo: {e}")
         return None
 
+def get_opcoes_select(db_info, coluna_nome):
+    """Busca as opções disponíveis de um campo Select no Notion"""
+    if not coluna_nome or coluna_nome not in db_info.get("properties", {}):
+        return []
+    
+    prop = db_info["properties"][coluna_nome]
+    if prop.get("type") == "select":
+        options = prop.get("select", {}).get("options", [])
+        return [opt.get("name") for opt in options if opt.get("name")]
+    return []
+
 # --- INICIALIZAÇÃO ---
 notion = Client(auth=NOTION_TOKEN)
 
@@ -271,6 +267,9 @@ id_analises = encontrar_tabela("Análises")
 if not all([id_projetos, id_cenarios, id_analises]):
     st.error("Tabelas não encontradas no Notion.")
     st.stop()
+
+# Busca info do database de Análises para pegar opções dos selects
+db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -327,8 +326,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
         if not cenarios:
             st.info("📭 Nenhum cenário encontrado para este projeto.")
         else:
-            db_info = notion.databases.retrieve(database_id=id_analises)
-            todas_props = db_info.get("properties", {})
+            todas_props = db_info_analises.get("properties", {})
             
             coluna_titulo_analise = encontrar_coluna_title(todas_props)
             
@@ -349,7 +347,17 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     col_relation = prop_name
                     break
             
-            st.markdown("## 📋 Cenários")
+            # Busca opções dos selects do Notion
+            opcoes_setor = get_opcoes_select(db_info_analises, colunas_reais.get("setor"))
+            opcoes_status = get_opcoes_select(db_info_analises, colunas_reais.get("status"))
+            
+            # Se não encontrou, usa lista padrão
+            if not opcoes_setor:
+                opcoes_setor = ["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
+            if not opcoes_status:
+                opcoes_status = ["Aprovado", "Reprovado", "Em Análise"]
+            
+            st.markdown("##  Cenários")
             
             for cenario in cenarios:
                 props = cenario.get("properties", {})
@@ -402,16 +410,14 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if anexos:
                         st.markdown(f"""
                         <div class="files-section">
-                            <h4> Arquivos Disponíveis ({len(anexos)})</h4>
+                            <h4>📎 Arquivos Disponíveis ({len(anexos)})</h4>
                         </div>
                         """, unsafe_allow_html=True)
                         
                         for idx, arquivo in enumerate(anexos):
-                            # Baixa o arquivo
                             conteudo = baixar_arquivo(arquivo['url'])
                             
                             if conteudo:
-                                # Layout: nome à esquerda, botão à direita
                                 col_nome, col_btn = st.columns([4, 1])
                                 
                                 with col_nome:
@@ -425,7 +431,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 
                                 with col_btn:
                                     st.download_button(
-                                        label="⬇️ Baixar",
+                                        label="️ Baixar",
                                         data=conteudo,
                                         file_name=arquivo['nome'],
                                         mime="application/octet-stream",
@@ -446,15 +452,21 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         
                         with col_f1:
                             nome_input = st.text_input("Analista Responsável", placeholder="Ex: João Silva")
+                            # Selectbox SEM valor padrão
                             setor_input = st.selectbox(
                                 "Setor",
-                                options=["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
+                                options=[""] + opcoes_setor,  # Adiciona opção vazia no início
+                                format_func=lambda x: "Selecione o setor" if x == "" else x,
+                                index=0  # Começa vazio
                             )
                         
                         with col_f2:
+                            # Selectbox SEM valor padrão
                             status_input = st.selectbox(
                                 "Status",
-                                options=["Aprovado", "Reprovado", "Em Análise"]
+                                options=[""] + opcoes_status,  # Adiciona opção vazia no início
+                                format_func=lambda x: "Selecione o status" if x == "" else x,
+                                index=0  # Começa vazio
                             )
                             motivo_input = st.text_area(
                                 "Motivo (obrigatório se reprovado)",
@@ -466,6 +478,10 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         if submit:
                             if not nome_input:
                                 st.error("❌ Preencha o nome do analista.")
+                            elif not setor_input:
+                                st.error("❌ Selecione o setor.")
+                            elif not status_input:
+                                st.error("❌ Selecione o status.")
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("❌ Informe o motivo da reprovação.")
                             else:
@@ -492,7 +508,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                     st.success(f"✅ Análise de '{nome_input}' salva com sucesso!")
                                     st.rerun()
                                 except Exception as e:
-                                    st.error(f"❌ Erro ao salvar: {e}")
+                                    st.error(f" Erro ao salvar: {e}")
                     
                     st.markdown("---")
                     
