@@ -377,58 +377,40 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
             
             col_relation = None
             for prop_name, prop_info in todas_props.items():
-                if prop_info.get("type") == "relation":
-                    col_relation = prop_name
-                    break
-            
-            opcoes_setor = get_opcoes_select(db_info_analises, colunas_reais.get("setor"))
-            opcoes_status = get_opcoes_select(db_info_analises, colunas_reais.get("status"))
-            
-            if not opcoes_setor:
-                opcoes_setor = ["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
-            if not opcoes_status:
-                opcoes_status = ["Aprovado", "Reprovado", "Em Análise"]
-            
-            st.markdown("## 📋 Cenários")
-            
-            for cenario in cenarios:
-                props = cenario.get("properties", {})
-                
-                col_titulo_cenario = encontrar_coluna_title(props)
-                nome_cenario = get_titulo_safe(props, col_titulo_cenario)
-                status = get_status_safe(props, "Status")
-                responsavel = get_people_safe(props, "Responsável")
-                
-                anexos = []
-                if "Anexos" in props:
-                    arquivos = props["Anexos"].get("files", [])
-                    if arquivos:
-                        for arquivo in arquivos:
-                            if arquivo.get("external", {}).get("url"):
-                                anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["external"]["url"]})
-                            elif arquivo.get("file", {}).get("url"):
-                                anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
-                
-                card_class = "scenario-card"
-                if status == "Aprovado":
-                    card_class += " scenario-card-aprovado"
-                elif status == "Reprovado":
-                    card_class += " scenario-card-reprovado"
-                
-                with st.expander(f"📄 {nome_cenario}", expanded=False):
-                    st.markdown(f"""
-                    <div class="{card_class}">
-                        <div class="scenario-title">{nome_cenario}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    if status == "Aprovado":
-                        st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
-                    elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
+                                    # SEÇÃO DE ANEXOS
+                    if anexos:
+                        # Título dinâmico: "Anexo" ou "Anexos"
+                        titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
+                        
+                        st.markdown(f"""
+                        <div class="files-section">
+                            <h4>📄 {titulo_anexos} ({len(anexos)})</h4>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        for idx, arquivo in enumerate(anexos):
+                            st.markdown(f"""
+                            <div class="file-row">
+                                <div class="file-name">
+                                    {arquivo['nome']}
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Botão de download/abertura
+                            st.download_button(
+                                label="⬇️ Baixar Arquivo",
+                                data=baixar_arquivo(arquivo['url']) or b"",
+                                file_name=arquivo['nome'],
+                                mime="application/octet-stream",
+                                key=f"download_{cenario['id']}_{idx}",
+                                type="secondary",
+                                use_container_width=True
+                            )
+                            
+                            st.markdown("<div style='margin-bottom: 0.75rem;'></div>", unsafe_allow_html=True)
                     else:
-                        st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
-                    
+                        st.info("📭 Nenhum anexo disponível")                    
                     st.markdown("---")
                     
                     st.markdown(f"""
