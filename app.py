@@ -5,40 +5,48 @@ from datetime import datetime
 # --- CONFIGURAÇÕES ---
 NOTION_TOKEN = "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"
 
+st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
-
-# --- CSS PERSONALIZADO ---
+# --- CSS PERSONALIZADO (Cores: Azul #0A5AA5, Laranja #FF6C12, Preto, Branco) ---
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
     * { box-sizing: border-box; }
+    
     body {
-        background-color: #f1f5f9;
+        background-color: #ffffff;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
+    
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+        background-color: #0A5AA5;
         padding: 2rem 1.5rem;
     }
     [data-testid="stSidebar"] * { color: white !important; }
     [data-testid="stSidebar"] .stSelectbox > div > div > div {
         background-color: white !important;
-        color: #1f2937 !important;
+        color: #000000 !important;
     }
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
-        color: #1f2937 !important;
+        color: #000000 !important;
     }
+    
+    /* Main */
     .main {
-        background-color: #f1f5f9;
+        background-color: #ffffff;
         padding: 2rem 3rem;
     }
+    
+    /* Header */
     .header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background-color: #0A5AA5;
         padding: 3rem 2rem;
         border-radius: 16px;
         margin-bottom: 2.5rem;
         text-align: center;
-        box-shadow: 0 20px 40px rgba(30, 58, 138, 0.2);
+        border-bottom: 4px solid #FF6C12;
     }
     .header h1 {
         color: white;
@@ -53,22 +61,27 @@ st.markdown("""
         margin: 0.75rem 0 0 0;
         font-weight: 500;
     }
+    
+    /* Scenario card */
     .scenario-card {
         background: white;
         border-radius: 16px;
         padding: 2rem;
         margin-bottom: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        border-left: 6px solid #f97316;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-left: 6px solid #FF6C12;
     }
-    .scenario-card-aprovado { border-left-color: #10b981; }
-    .scenario-card-reprovado { border-left-color: #ef4444; }
+    .scenario-card-aprovado { border-left-color: #0A5AA5; }
+    .scenario-card-reprovado { border-left-color: #000000; }
+    
     .scenario-title {
         font-size: 1.8rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #000000;
         margin-bottom: 1rem;
     }
+    
+    /* Status badge */
     .status-badge {
         display: inline-block;
         padding: 0.5rem 1.25rem;
@@ -78,54 +91,62 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .status-aprovado { background: #10b981; color: white; }
-    .status-reprovado { background: #ef4444; color: white; }
-    .status-pendente { background: #f97316; color: white; }
+    .status-aprovado { background: #0A5AA5; color: white; }
+    .status-reprovado { background: #000000; color: white; }
+    .status-pendente { background: #FF6C12; color: white; }
+    
+    /* Info box */
     .info-box {
-        background: #f8fafc;
+        background: #f8f9fa;
         padding: 1.5rem;
         border-radius: 12px;
         margin-bottom: 1.5rem;
         font-size: 1.05rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e5e7eb;
     }
+    
+    /* Files section */
     .files-section {
         background: white;
         padding: 2rem;
         border-radius: 12px;
         margin: 1.5rem 0;
-        border: 2px solid #3b82f6;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+        border: 2px solid #0A5AA5;
+        box-shadow: 0 4px 15px rgba(10, 90, 165, 0.1);
     }
     .files-section h4 {
-        color: #1e3a8a;
+        color: #0A5AA5;
         font-size: 1.3rem;
         font-weight: 700;
         margin-bottom: 1.5rem;
     }
+    
+    /* File row */
     .file-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #f8fafc;
+        background: #f8f9fa;
         padding: 1rem 1.5rem;
         border-radius: 10px;
         margin-bottom: 0.75rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e5e7eb;
         transition: all 0.2s ease;
     }
     .file-row:hover {
-        background: #f1f5f9;
-        border-color: #3b82f6;
+        background: #f0f4f8;
+        border-color: #0A5AA5;
     }
     .file-name {
         font-weight: 600;
-        color: #1f2937;
+        color: #000000;
         font-size: 1rem;
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
+    
+    /* Streamlit buttons */
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
@@ -134,17 +155,23 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     .stButton > button[kind="primary"] {
-        background: #10b981;
+        background: #0A5AA5;
         color: white;
         border: none;
     }
-    .stButton > button[kind="primary"]:hover { background: #059669; }
+    .stButton > button[kind="primary"]:hover {
+        background: #084a8a;
+    }
     .stButton > button[kind="secondary"] {
-        background: #ef4444;
+        background: #FF6C12;
         color: white;
         border: none;
     }
-    .stButton > button[kind="secondary"]:hover { background: #dc2626; }
+    .stButton > button[kind="secondary"]:hover {
+        background: #e55f0f;
+    }
+    
+    /* Form inputs */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -155,25 +182,29 @@ st.markdown("""
     }
     .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #0A5AA5;
+        box-shadow: 0 0 0 3px rgba(10, 90, 165, 0.1);
     }
+    
+    /* Expander */
     .stExpander {
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e5e7eb;
         border-radius: 12px;
         margin-bottom: 1.5rem;
         background: white;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
+    
     label {
         font-size: 1rem;
         font-weight: 600;
-        color: #374151;
+        color: #000000;
     }
+    
     h3, h4 {
         font-size: 1.4rem;
         font-weight: 700;
-        color: #1f2937;
+        color: #000000;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -238,19 +269,23 @@ def get_people_safe(props, coluna_nome):
     return "Não definido"
 
 def baixar_arquivo(url):
-    """Baixa o arquivo e retorna o conteúdo em bytes"""
+    """Baixa o arquivo com headers de navegador"""
     try:
-        with urllib.request.urlopen(url, timeout=30) as response:
+        req = urllib.request.Request(
+            url,
+            headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': '*/*',
+            }
+        )
+        with urllib.request.urlopen(req, timeout=30) as response:
             return response.read()
     except Exception as e:
-        st.error(f"Erro ao baixar arquivo: {e}")
         return None
 
 def get_opcoes_select(db_info, coluna_nome):
-    """Busca as opções disponíveis de um campo Select no Notion"""
     if not coluna_nome or coluna_nome not in db_info.get("properties", {}):
         return []
-    
     prop = db_info["properties"][coluna_nome]
     if prop.get("type") == "select":
         options = prop.get("select", {}).get("options", [])
@@ -268,7 +303,6 @@ if not all([id_projetos, id_cenarios, id_analises]):
     st.error("Tabelas não encontradas no Notion.")
     st.stop()
 
-# Busca info do database de Análises para pegar opções dos selects
 db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
 # --- SIDEBAR ---
@@ -288,7 +322,7 @@ with st.sidebar:
                 nome_proj = get_titulo_safe(props, col_titulo)
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
-            st.markdown("**📁 Projetos**")
+            st.markdown("** Projetos**")
             projeto_escolhido = st.selectbox(
                 "Selecione o projeto:",
                 options=lista_projetos,
@@ -347,17 +381,15 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     col_relation = prop_name
                     break
             
-            # Busca opções dos selects do Notion
             opcoes_setor = get_opcoes_select(db_info_analises, colunas_reais.get("setor"))
             opcoes_status = get_opcoes_select(db_info_analises, colunas_reais.get("status"))
             
-            # Se não encontrou, usa lista padrão
             if not opcoes_setor:
                 opcoes_setor = ["Contabilidade", "Apuração", "Fiscal", "Jurídico", "Auditoria"]
             if not opcoes_status:
                 opcoes_status = ["Aprovado", "Reprovado", "Em Análise"]
             
-            st.markdown("##  Cenários")
+            st.markdown("## 📋 Cenários")
             
             for cenario in cenarios:
                 props = cenario.get("properties", {})
@@ -402,11 +434,11 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     st.markdown(f"""
                     <div class="info-box">
                         <strong>👤 Responsável:</strong> {responsavel}<br><br>
-                        <strong>📊 Status:</strong> {status}
+                        <strong> Status:</strong> {status}
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # SEÇÃO DE ARQUIVOS COM DOWNLOAD FUNCIONAL
+                    # SEÇÃO DE ARQUIVOS - DOWNLOAD FUNCIONAL
                     if anexos:
                         st.markdown(f"""
                         <div class="files-section">
@@ -415,23 +447,25 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         """, unsafe_allow_html=True)
                         
                         for idx, arquivo in enumerate(anexos):
+                            # Tenta baixar o arquivo
                             conteudo = baixar_arquivo(arquivo['url'])
                             
                             if conteudo:
+                                # Layout: nome à esquerda, botão à direita
                                 col_nome, col_btn = st.columns([4, 1])
                                 
                                 with col_nome:
                                     st.markdown(f"""
                                     <div class="file-row" style="margin-bottom: 0;">
                                         <div class="file-name">
-                                            📄 {arquivo['nome']}
+                                             {arquivo['nome']}
                                         </div>
                                     </div>
                                     """, unsafe_allow_html=True)
                                 
                                 with col_btn:
                                     st.download_button(
-                                        label="️ Baixar",
+                                        label="⬇️ Baixar",
                                         data=conteudo,
                                         file_name=arquivo['nome'],
                                         mime="application/octet-stream",
@@ -439,34 +473,44 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                         type="primary",
                                         use_container_width=True
                                     )
+                            else:
+                                # Fallback: link direto se o download falhar
+                                st.markdown(f"""
+                                <div class="file-row">
+                                    <div class="file-name">
+                                         {arquivo['nome']}
+                                    </div>
+                                    <a href="{arquivo['url']}" target="_blank" style="background: #FF6C12; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                                        🔗 Abrir Arquivo
+                                    </a>
+                                </div>
+                                """, unsafe_allow_html=True)
                     else:
-                        st.info(" Nenhum arquivo disponível")
+                        st.info("📭 Nenhum arquivo disponível")
                     
                     st.markdown("---")
                     
                     # FORMULÁRIO
-                    st.markdown("### 📝 Registrar Nova Análise")
+                    st.markdown("###  Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
                         
                         with col_f1:
                             nome_input = st.text_input("Analista Responsável", placeholder="Ex: João Silva")
-                            # Selectbox SEM valor padrão
                             setor_input = st.selectbox(
                                 "Setor",
-                                options=[""] + opcoes_setor,  # Adiciona opção vazia no início
+                                options=[""] + opcoes_setor,
                                 format_func=lambda x: "Selecione o setor" if x == "" else x,
-                                index=0  # Começa vazio
+                                index=0
                             )
                         
                         with col_f2:
-                            # Selectbox SEM valor padrão
                             status_input = st.selectbox(
                                 "Status",
-                                options=[""] + opcoes_status,  # Adiciona opção vazia no início
+                                options=[""] + opcoes_status,
                                 format_func=lambda x: "Selecione o status" if x == "" else x,
-                                index=0  # Começa vazio
+                                index=0
                             )
                             motivo_input = st.text_area(
                                 "Motivo (obrigatório se reprovado)",
@@ -481,7 +525,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif not setor_input:
                                 st.error("❌ Selecione o setor.")
                             elif not status_input:
-                                st.error("❌ Selecione o status.")
+                                st.error(" Selecione o status.")
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("❌ Informe o motivo da reprovação.")
                             else:
@@ -508,7 +552,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                     st.success(f"✅ Análise de '{nome_input}' salva com sucesso!")
                                     st.rerun()
                                 except Exception as e:
-                                    st.error(f" Erro ao salvar: {e}")
+                                    st.error(f"❌ Erro ao salvar: {e}")
                     
                     st.markdown("---")
                     
