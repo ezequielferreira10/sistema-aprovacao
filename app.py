@@ -35,6 +35,16 @@ footer[data-testid="stFooter"] {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: 14px;
     }
+
+    /* Esconde o botão flutuante "Gerenciar aplicativo" */
+[data-testid="stFloatingActionButton"] {
+    display: none !important;
+}
+
+/* Esconde qualquer botão de gerenciamento */
+.stApp > div:last-child {
+    display: none !important;
+}
     
     /* Sidebar - Estilo Premium */
     [data-testid="stSidebar"] {
