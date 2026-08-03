@@ -16,13 +16,23 @@ st.markdown("""
     /* 1. RESET E BASE */
     * { box-sizing: border-box; }
     
-    /* 2. ESCONDER ELEMENTOS DO STREAMLIT (FORÇADO) */
-    header[data-testid="stHeader"] { display: none !important; }
-    [data-testid="stToolbar"] { display: none !important; }
-    footer { visibility: hidden !important; }
-    footer::after { content: "" !important; visibility: hidden !important; }
-    [data-testid="stFloatingActionButton"] { display: none !important; }
-    .stApp > header { display: none !important; }
+    /* 2. ESCONDER TUDO DO STREAMLIT - VERSÃO AGRESSIVA */
+    header[data-testid="stHeader"] { display: none !important; visibility: hidden !important; height: 0 !important; }
+    [data-testid="stToolbar"] { display: none !important; visibility: hidden !important; }
+    [data-testid="stFloatingActionButton"] { display: none !important; visibility: hidden !important; }
+    [data-testid="stSidebarToggle"] { display: none !important; }
+    
+    /* Esconde o botão "Manage app" do Streamlit Cloud */
+    .stApp > div:last-child { display: none !important; }
+    #root > div:last-child { display: none !important; }
+    
+    /* Footer */
+    footer { display: none !important; visibility: hidden !important; }
+    footer::before { display: none !important; }
+    footer::after { display: none !important; content: "" !important; }
+    
+    /* Remove padding/margin extras */
+    .stApp { padding-top: 0 !important; }
     
     /* 3. ESTILOS GERAIS */
     body {
