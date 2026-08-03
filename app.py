@@ -12,6 +12,17 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
+    /* ESCONDER TUDO DO STREAMLIT - VERSÃO ULTRA AGRESSIVA */
+    header[data-testid="stHeader"] { display: none !important; visibility: hidden !important; height: 0 !important; }
+    [data-testid="stToolbar"] { display: none !important; visibility: hidden !important; }
+    [data-testid="stFloatingActionButton"] { display: none !important; visibility: hidden !important; }
+    .stApp > div:last-child { display: none !important; }
+    #MainMenu { visibility: hidden !important; }
+    .stApp > header { display: none !important; }
+    .viewer { padding-top: 0 !important; }
+    [data-testid="stSidebarNav"] { display: none !important; }
+    .stApp [data-testid="stSidebar"] { overflow: hidden !important; }
+    
     * { box-sizing: border-box; }
     
     body {
