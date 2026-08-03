@@ -203,23 +203,6 @@ st.markdown("""
         font-weight: 700;
         color: #000000;
     }
-    
-    .analysis-card {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        border-left: 4px solid #0A5AA5;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .analysis-card-aprovado {
-        background: #f0f9ff;
-        border-left-color: #0A5AA5;
-    }
-    .analysis-card-reprovado {
-        background: #fff7ed;
-        border-left-color: #FF6C12;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -376,7 +359,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
         cenarios = cenarios_response.get("results", [])
         
         if not cenarios:
-            st.info(" Nenhum cenário encontrado para este projeto.")
+            st.info("📭 Nenhum cenário encontrado para este projeto.")
         else:
             todas_props = db_info_analises.get("properties", {})
             
@@ -443,7 +426,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     if status == "Aprovado":
                         st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
                     elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado"> REPROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
                     else:
                         st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
                     
@@ -505,7 +488,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     
                     st.markdown("---")
                     
-                    # FORMULÁRIO ORIGINAL - VOLTADO
+                    # FORMULÁRIO DE ANÁLISE
                     st.markdown("### 📝 Registrar Nova Análise")
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
@@ -532,7 +515,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 placeholder="Explique o motivo da reprovação..."
                             )
                         
-                        submit = st.form_submit_button(" Salvar Análise", type="primary", use_container_width=True)
+                        submit = st.form_submit_button("💾 Salvar Análise", type="primary", use_container_width=True)
                         
                         if submit:
                             if not nome_input:
@@ -540,7 +523,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif not setor_input:
                                 st.error("❌ Selecione o setor.")
                             elif not status_input:
-                                st.error(" Selecione o status.")
+                                st.error("❌ Selecione o status.")
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("❌ Informe o motivo da reprovação.")
                             else:
@@ -588,32 +571,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                         st.rerun()
                                     except Exception as e:
                                         st.error(f"❌ Erro ao salvar: {e}")
-                    
-                    st.markdown("---")
-                    
-                    # BOTÕES DE DECISÃO FINAL
-                    if status == "Pronto para Análise":
-                        st.markdown("### ✅ Decisão Final do Cenário")
-                        st.markdown("Aprove ou reprova este cenário de forma definitiva")
-                        
-                        col_ap, col_rp = st.columns(2)
-                        with col_ap:
-                            if st.button("✅ Aprovar Cenário", type="primary", use_container_width=True, key=f"ap_final_{cenario['id']}"):
-                                notion.pages.update(
-                                    page_id=cenario["id"],
-                                    properties={"Status": {"select": {"name": "Aprovado"}}}
-                                )
-                                st.balloons()
-                                st.success("🎉 Cenário Aprovado!")
-                                st.rerun()
-                        with col_rp:
-                            if st.button(" Reprovar Cenário", type="secondary", use_container_width=True, key=f"rp_final_{cenario['id']}"):
-                                notion.pages.update(
-                                    page_id=cenario["id"],
-                                    properties={"Status": {"select": {"name": "Reprovado"}}}
-                                )
-                                st.error("Cenário Reprovado!")
-                                st.rerun()
     
     except Exception as e:
         st.error(f"❌ Erro: {e}")
