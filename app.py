@@ -12,16 +12,10 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    /* ESCONDER TUDO DO STREAMLIT - VERSÃO ULTRA AGRESSIVA */
-    header[data-testid="stHeader"] { display: none !important; visibility: hidden !important; height: 0 !important; }
-    [data-testid="stToolbar"] { display: none !important; visibility: hidden !important; }
-    [data-testid="stFloatingActionButton"] { display: none !important; visibility: hidden !important; }
-    .stApp > div:last-child { display: none !important; }
-    #MainMenu { visibility: hidden !important; }
-    .stApp > header { display: none !important; }
-    .viewer { padding-top: 0 !important; }
-    [data-testid="stSidebarNav"] { display: none !important; }
-    .stApp [data-testid="stSidebar"] { overflow: hidden !important; }
+    /* ESCONDER STREAMLIT */
+    header[data-testid="stHeader"] { display: none !important; }
+    [data-testid="stToolbar"] { display: none !important; }
+    footer { display: none !important; }
     
     * { box-sizing: border-box; }
     
@@ -66,7 +60,6 @@ st.markdown("""
         border-radius: 16px;
         margin-bottom: 2rem;
         text-align: center;
-        box-shadow: 0 10px 30px rgba(10, 90, 165, 0.25);
     }
     .header h1 {
         color: white;
@@ -326,7 +319,6 @@ if not all([id_projetos, id_cenarios, id_analises]):
 
 db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
-# SIDEBAR - SELECIONAR PROJETO
 with st.sidebar:
     st.markdown("### Compliance Tributário")
     st.markdown("---")
@@ -359,7 +351,6 @@ with st.sidebar:
     except Exception as e:
         st.error(f"Erro: {e}")
 
-# ÁREA PRINCIPAL
 if 'projeto_escolhido' in dir() and projeto_escolhido:
     st.markdown(f"""
     <div class="header">
