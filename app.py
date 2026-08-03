@@ -14,6 +14,21 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     * { box-sizing: border-box; }
+
+    /* Esconde a barra superior do Streamlit */
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+
+/* Esconde o menu "Manage app" */
+[data-testid="stToolbar"] {
+    display: none !important;
+}
+
+/* Esconde o footer "Made with Streamlit" */
+footer[data-testid="stFooter"] {
+    display: none !important;
+}
     
     body {
         background-color: #f1f5f9;
