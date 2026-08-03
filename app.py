@@ -8,7 +8,7 @@ NOTION_TOKEN = "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"
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
-# --- CSS PERSONALIZADO ---
+# --- CSS PERSONALIZADO (Redesign Moderno) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -16,12 +16,14 @@ st.markdown("""
     * { box-sizing: border-box; }
     
     body {
-        background-color: #ffffff;
+        background-color: #f8fafc;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 14px;
     }
     
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #0A5AA5;
+        background: linear-gradient(180deg, #0A5AA5 0%, #084a8a 100%);
         padding: 2rem 1.5rem;
     }
     [data-testid="stSidebar"] * { color: white !important; }
@@ -32,96 +34,107 @@ st.markdown("""
         color: #000000 !important;
     }
     
+    /* Main */
     .main {
-        background-color: #ffffff;
+        background-color: #f8fafc;
         padding: 2rem 3rem;
     }
     
+    /* Header compacto */
     .header {
-        background-color: #0A5AA5;
-        padding: 3rem 2rem;
-        border-radius: 16px;
-        margin-bottom: 2.5rem;
+        background: linear-gradient(135deg, #0A5AA5 0%, #084a8a 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
         text-align: center;
-        border-bottom: 4px solid #FF6C12;
+        border-bottom: 3px solid #FF6C12;
     }
     .header h1 {
         color: white;
-        font-size: 3rem;
-        font-weight: 800;
+        font-size: 2rem;
+        font-weight: 700;
         margin: 0;
-        letter-spacing: -1px;
+        letter-spacing: -0.5px;
     }
     .header p {
         color: rgba(255,255,255,0.9);
-        font-size: 1.2rem;
-        margin: 0.75rem 0 0 0;
+        font-size: 1rem;
+        margin: 0.5rem 0 0 0;
         font-weight: 500;
     }
     
+    /* Scenario card - mais compacto */
     .scenario-card {
         background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border-left: 6px solid #FF6C12;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border-left: 4px solid #FF6C12;
     }
     .scenario-card-aprovado { border-left-color: #0A5AA5; }
     .scenario-card-reprovado { border-left-color: #FF6C12; }
     
     .scenario-title {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
         font-weight: 700;
-        color: #000000;
-        margin-bottom: 1rem;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
     }
     
+    /* Status badge */
     .status-badge {
         display: inline-block;
-        padding: 0.5rem 1.25rem;
+        padding: 0.375rem 0.875rem;
         border-radius: 999px;
-        font-weight: 700;
-        font-size: 0.9rem;
+        font-weight: 600;
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .status-aprovado { background: #0A5AA5; color: white; }
     .status-reprovado { background: #FF6C12; color: white; }
-    .status-pendente { background: #f1f5f9; color: #0A5AA5; border: 2px solid #0A5AA5; }
+    .status-pendente { background: #f1f5f9; color: #0A5AA5; border: 1.5px solid #0A5AA5; }
     
+    /* Info box compacta */
     .info-box {
-        background: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        font-size: 1.05rem;
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
         border: 1px solid #e5e7eb;
     }
+    .info-box strong {
+        color: #0A5AA5;
+    }
     
+    /* Files section */
     .files-section {
-        margin: 1.5rem 0 0.5rem 0;
+        margin: 1rem 0;
         padding: 0;
     }
     .files-section h4 {
         color: #0A5AA5;
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 700;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid #0A5AA5;
         display: inline-block;
     }
     
+    /* File row compacta */
     .file-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #f8f9fa;
-        padding: 0.875rem 1.25rem;
-        border-radius: 10px;
+        background: #f8fafc;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
         margin-bottom: 0.5rem;
         border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
         gap: 1rem;
     }
     .file-row:hover {
@@ -130,8 +143,8 @@ st.markdown("""
     }
     .file-name {
         font-weight: 600;
-        color: #000000;
-        font-size: 1rem;
+        color: #1f2937;
+        font-size: 0.95rem;
         flex: 1;
     }
     .file-name::before {
@@ -139,21 +152,22 @@ st.markdown("""
         margin-right: 0.5rem;
     }
     
+    /* Streamlit buttons - modernos */
     .stButton > button {
-        border-radius: 10px;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: 1rem;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        padding: 0.625rem 1.25rem;
+        transition: all 0.2s ease;
     }
     .stButton > button[kind="primary"] {
-        background: white;
-        color: #0A5AA5;
-        border: 2px solid #0A5AA5;
-    }
-    .stButton > button[kind="primary"]:hover {
         background: #0A5AA5;
         color: white;
+        border: none;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: #084a8a;
+        transform: translateY(-1px);
     }
     .stButton > button[kind="secondary"] {
         background: white;
@@ -169,14 +183,20 @@ st.markdown("""
         color: #64748b;
         border: 2px solid #e2e8f0;
     }
+    .stButton > button[kind="tertiary"]:hover {
+        background: #f1f5f9;
+        border-color: #0A5AA5;
+        color: #0A5AA5;
+    }
     
+    /* Form inputs */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
         border-radius: 8px;
-        border: 2px solid #e5e7eb;
+        border: 1.5px solid #e5e7eb;
         background: white;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
@@ -184,24 +204,39 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(10, 90, 165, 0.1);
     }
     
+    /* Expander */
     .stExpander {
         border: 1px solid #e5e7eb;
         border-radius: 12px;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         background: white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     
     label {
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-weight: 600;
-        color: #000000;
+        color: #374151;
     }
     
     h3, h4 {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        color: #000000;
+        color: #1f2937;
+    }
+    
+    /* Seção de análise destacada */
+    .analysis-section {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+    .analysis-section h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: #0A5AA5;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -424,17 +459,17 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     """, unsafe_allow_html=True)
                     
                     if status == "Aprovado":
-                        st.markdown('<span class="status-badge status-aprovado">✅ APROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-aprovado">✅ Aprovado</span>', unsafe_allow_html=True)
                     elif status == "Reprovado":
-                        st.markdown('<span class="status-badge status-reprovado">❌ REPROVADO</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-reprovado"> Reprovado</span>', unsafe_allow_html=True)
                     else:
-                        st.markdown('<span class="status-badge status-pendente">⏳ PRONTO PARA ANÁLISE</span>', unsafe_allow_html=True)
+                        st.markdown('<span class="status-badge status-pendente">⏳ Pronto para Análise</span>', unsafe_allow_html=True)
                     
                     st.markdown("---")
                     
                     st.markdown(f"""
                     <div class="info-box">
-                        <strong>👤 Responsável:</strong> {responsavel}<br><br>
+                        <strong>👤 Responsável:</strong> {responsavel} &nbsp;&nbsp;|&nbsp;&nbsp; 
                         <strong>📊 Status:</strong> {status}
                     </div>
                     """, unsafe_allow_html=True)
@@ -445,7 +480,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         
                         st.markdown(f"""
                         <div class="files-section">
-                            <h4>📄 {titulo_anexos} ({len(anexos)})</h4>
+                            <h4> {titulo_anexos} ({len(anexos)})</h4>
                         </div>
                         """, unsafe_allow_html=True)
                         
@@ -486,18 +521,20 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     else:
                         st.info("📭 Nenhum anexo disponível")
                     
-                    st.markdown("---")
-                    
-                    # FORMULÁRIO DE ANÁLISE
-                    st.markdown("### 📝 Registrar Nova Análise")
+                    # FORMULÁRIO DE ANÁLISE - SEÇÃO DESTACADA
+                    st.markdown("""
+                    <div class="analysis-section">
+                        <h3>📝 Registrar Nova Análise</h3>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
                         
                         with col_f1:
-                            nome_input = st.text_input("Analista Responsável", placeholder="Ex: João Silva")
+                            nome_input = st.text_input("👤 Analista Responsável", placeholder="Ex: João Silva")
                             setor_input = st.selectbox(
-                                "Setor",
+                                " Setor",
                                 options=[""] + opcoes_setor,
                                 format_func=lambda x: "Selecione o setor" if x == "" else x,
                                 index=0
@@ -505,13 +542,13 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                         
                         with col_f2:
                             status_input = st.selectbox(
-                                "Status",
+                                "✅ Status",
                                 options=[""] + opcoes_status,
                                 format_func=lambda x: "Selecione o status" if x == "" else x,
                                 index=0
                             )
                             motivo_input = st.text_area(
-                                "Motivo (obrigatório se reprovado)",
+                                "💬 Motivo (obrigatório se reprovado)",
                                 placeholder="Explique o motivo da reprovação..."
                             )
                         
