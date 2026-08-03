@@ -16,7 +16,17 @@ st.markdown("""
     header[data-testid="stHeader"] { display: none !important; }
     [data-testid="stToolbar"] { display: none !important; }
     footer { display: none !important; }
-    
+
+    /* ESSA É A NOVA QUE ESCONDE O BOTÃO FLUTUANTE DO CANTO */
+    [data-testid="stFloatingActionButton"],
+    .stApp > div:last-child,
+    #streamlit-deploy-button {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
     * { box-sizing: border-box; }
     
     body {
