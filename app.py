@@ -14,11 +14,6 @@ st.markdown("""
     
     * { box-sizing: border-box; }
     
-    header[data-testid="stHeader"] { display: none !important; }
-    [data-testid="stToolbar"] { display: none !important; }
-    footer { display: none !important; }
-    [data-testid="stFloatingActionButton"] { display: none !important; }
-    
     body {
         background-color: #f1f5f9;
         font-family: 'Inter', sans-serif;
@@ -27,52 +22,26 @@ st.markdown("""
     
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0A5AA5 0%, #0c4a8a 100%);
-        padding: 2.5rem 1.5rem;
-        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        padding: 2rem 1.5rem;
     }
     [data-testid="stSidebar"] * { color: white !important; }
     
     [data-testid="stSidebar"] h3 {
-        font-size: 1.5rem !important;
+        font-size: 1.4rem !important;
         font-weight: 700 !important;
-        margin-bottom: 2rem !important;
+        margin-bottom: 1.5rem !important;
         padding-bottom: 1rem !important;
         border-bottom: 2px solid rgba(255,255,255,0.2) !important;
     }
     
-    [data-testid="stSidebar"] .stMarkdown {
-        font-size: 0.75rem !important;
-        font-weight: 700 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1.5px !important;
-        color: rgba(255,255,255,0.7) !important;
-        margin-bottom: 1rem !important;
-    }
-    
     [data-testid="stSidebar"] .stSelectbox > div > div > div {
-        background-color: rgba(255,255,255,0.95) !important;
-        border-radius: 10px !important;
-        border: 2px solid rgba(255,255,255,0.3) !important;
-        padding: 0.75rem 1rem !important;
-        font-weight: 600 !important;
+        background-color: white !important;
+        border-radius: 8px !important;
+        padding: 0.5rem !important;
     }
-    
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
         color: #0A5AA5 !important;
         font-weight: 600 !important;
-    }
-    
-    [data-testid="stSidebar"] .stSuccess {
-        background: rgba(255,255,255,0.15) !important;
-        border: 1px solid rgba(255,255,255,0.3) !important;
-        border-radius: 12px !important;
-        padding: 1rem 1.25rem !important;
-        margin-top: 1rem !important;
-    }
-    
-    [data-testid="stSidebar"] hr {
-        border-color: rgba(255,255,255,0.2) !important;
-        margin: 1.5rem 0 !important;
     }
     
     .main {
@@ -84,7 +53,7 @@ st.markdown("""
         background: linear-gradient(135deg, #0A5AA5 0%, #084a8a 100%);
         padding: 3rem 2rem;
         border-radius: 16px;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
         text-align: center;
         box-shadow: 0 10px 30px rgba(10, 90, 165, 0.25);
     }
@@ -346,6 +315,7 @@ if not all([id_projetos, id_cenarios, id_analises]):
 
 db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
+# SIDEBAR - SELECIONAR PROJETO
 with st.sidebar:
     st.markdown("### Compliance Tributário")
     st.markdown("---")
@@ -363,7 +333,12 @@ with st.sidebar:
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
             st.markdown("**Projetos**")
-            projeto_escolhido = st.selectbox("Selecione o projeto:", options=lista_projetos, format_func=lambda x: x["nome"], label_visibility="collapsed")
+            projeto_escolhido = st.selectbox(
+                "Selecione o projeto:",
+                options=lista_projetos,
+                format_func=lambda x: x["nome"],
+                label_visibility="collapsed"
+            )
             
             if projeto_escolhido:
                 st.markdown("---")
@@ -373,6 +348,7 @@ with st.sidebar:
     except Exception as e:
         st.error(f"Erro: {e}")
 
+# ÁREA PRINCIPAL
 if 'projeto_escolhido' in dir() and projeto_escolhido:
     st.markdown(f"""
     <div class="header">
