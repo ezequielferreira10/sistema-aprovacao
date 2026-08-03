@@ -8,63 +8,36 @@ NOTION_TOKEN = "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"
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
-# --- CSS PERSONALIZADO ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    /* 1. RESET E BASE */
     * { box-sizing: border-box; }
     
-    /* 2. ESCONDER TUDO DO STREAMLIT - VERSÃO AGRESSIVA */
-    header[data-testid="stHeader"] { display: none !important; visibility: hidden !important; height: 0 !important; }
-    [data-testid="stToolbar"] { display: none !important; visibility: hidden !important; }
-    [data-testid="stFloatingActionButton"] { display: none !important; visibility: hidden !important; }
-    [data-testid="stSidebarToggle"] { display: none !important; }
+    header[data-testid="stHeader"] { display: none !important; }
+    [data-testid="stToolbar"] { display: none !important; }
+    footer { display: none !important; }
+    [data-testid="stFloatingActionButton"] { display: none !important; }
     
-    /* Esconde o botão "Manage app" do Streamlit Cloud */
-    .stApp > div:last-child { display: none !important; }
-    #root > div:last-child { display: none !important; }
-    
-    /* Footer */
-    footer { display: none !important; visibility: hidden !important; }
-    footer::before { display: none !important; }
-    footer::after { display: none !important; content: "" !important; }
-    
-    /* Remove padding/margin extras */
-    .stApp { padding-top: 0 !important; }
-    
-    /* 3. ESTILOS GERAIS */
     body {
         background-color: #f1f5f9;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family: 'Inter', sans-serif;
         font-size: 14px;
-        color: #111827;
     }
     
-    /* Sidebar - Estilo Premium */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0A5AA5 0%, #0c4a8a 100%);
         padding: 2.5rem 1.5rem;
         box-shadow: 4px 0 20px rgba(0,0,0,0.1);
     }
-    [data-testid="stSidebar"] * { 
-        color: white !important; 
-    }
+    [data-testid="stSidebar"] * { color: white !important; }
     
-    /* Título da sidebar */
     [data-testid="stSidebar"] h3 {
         font-size: 1.5rem !important;
         font-weight: 700 !important;
         margin-bottom: 2rem !important;
         padding-bottom: 1rem !important;
         border-bottom: 2px solid rgba(255,255,255,0.2) !important;
-        letter-spacing: -0.5px !important;
-    }
-    
-    /* Label "Projetos" */
-    [data-testid="stSidebar"] > div:nth-child(3) {
-        margin-top: 2rem !important;
     }
     
     [data-testid="stSidebar"] .stMarkdown {
@@ -76,19 +49,12 @@ st.markdown("""
         margin-bottom: 1rem !important;
     }
     
-    /* Selectbox - mais elegante */
     [data-testid="stSidebar"] .stSelectbox > div > div > div {
         background-color: rgba(255,255,255,0.95) !important;
         border-radius: 10px !important;
         border: 2px solid rgba(255,255,255,0.3) !important;
         padding: 0.75rem 1rem !important;
         font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    [data-testid="stSidebar"] .stSelectbox > div > div > div:hover {
-        border-color: rgba(255,255,255,0.6) !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
     }
     
     [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
@@ -96,42 +62,24 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Projeto selecionado - CARD BONITO */
     [data-testid="stSidebar"] .stSuccess {
         background: rgba(255,255,255,0.15) !important;
         border: 1px solid rgba(255,255,255,0.3) !important;
         border-radius: 12px !important;
         padding: 1rem 1.25rem !important;
         margin-top: 1rem !important;
-        backdrop-filter: blur(10px) !important;
-        transition: all 0.3s ease !important;
     }
     
-    [data-testid="stSidebar"] .stSuccess:hover {
-        background: rgba(255,255,255,0.25) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
-    }
-    
-    [data-testid="stSidebar"] .stSuccess p {
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        margin: 0 !important;
-    }
-    
-    /* Divider */
     [data-testid="stSidebar"] hr {
         border-color: rgba(255,255,255,0.2) !important;
         margin: 1.5rem 0 !important;
-    }    
+    }
     
-    /* Main */
     .main {
         background-color: #f1f5f9;
         padding: 2rem 3rem;
     }
     
-    /* Header Azul Institucional */
     .header {
         background: linear-gradient(135deg, #0A5AA5 0%, #084a8a 100%);
         padding: 3rem 2rem;
@@ -145,16 +93,13 @@ st.markdown("""
         font-size: 2.5rem;
         font-weight: 800;
         margin: 0;
-        letter-spacing: -1px;
     }
     .header p {
         color: rgba(255,255,255,0.9);
         font-size: 1.1rem;
         margin: 0.75rem 0 0 0;
-        font-weight: 500;
     }
     
-    /* Label de seção */
     .section-label {
         font-size: 0.75rem;
         font-weight: 700;
@@ -164,7 +109,6 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Scenario card */
     .scenario-container {
         background: white;
         border-radius: 16px;
@@ -186,37 +130,20 @@ st.markdown("""
         font-weight: 800;
         color: #0A5AA5;
         margin: 0;
-        letter-spacing: -0.5px;
     }
     
-    /* Status badge GRANDE e destacado */
     .status-badge {
         display: inline-flex;
-        align-items: center;
         padding: 0.75rem 1.5rem;
         border-radius: 999px;
         font-weight: 700;
         font-size: 0.95rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
-    .status-aprovado { 
-        background: #0A5AA5; 
-        color: white;
-        box-shadow: 0 4px 12px rgba(10, 90, 165, 0.3);
-    }
-    .status-reprovado { 
-        background: #FF6C12; 
-        color: white;
-        box-shadow: 0 4px 12px rgba(255, 108, 18, 0.3);
-    }
-    .status-pendente { 
-        background: #f1f5f9; 
-        color: #0A5AA5;
-        border: 2px solid #0A5AA5;
-    }
+    .status-aprovado { background: #0A5AA5; color: white; }
+    .status-reprovado { background: #FF6C12; color: white; }
+    .status-pendente { background: #f1f5f9; color: #0A5AA5; border: 2px solid #0A5AA5; }
     
-    /* Info box - RESPONSÁVEL E STATUS DESTACADOS */
     .info-section {
         padding: 1.5rem 2rem;
         background: #f8fafc;
@@ -226,11 +153,7 @@ st.markdown("""
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
     }
-    .info-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
+    .info-item { display: flex; flex-direction: column; gap: 0.5rem; }
     .info-label {
         font-size: 0.75rem;
         font-weight: 700;
@@ -244,11 +167,7 @@ st.markdown("""
         color: #111827;
     }
     
-    /* Files section */
-    .files-section {
-        padding: 1.5rem 2rem;
-        background: white;
-    }
+    .files-section { padding: 1.5rem 2rem; background: white; }
     .files-label {
         font-size: 0.75rem;
         font-weight: 700;
@@ -268,7 +187,6 @@ st.markdown("""
         border-left: 3px solid #FF6C12;
     }
     
-    /* File row */
     .file-row {
         display: flex;
         justify-content: space-between;
@@ -278,34 +196,15 @@ st.markdown("""
         border-radius: 10px;
         margin-bottom: 0.75rem;
         border: 1px solid #e5e7eb;
-        gap: 1rem;
-        transition: all 0.2s ease;
     }
-    .file-row:hover {
-        background: #f0f4f8;
-        border-color: #0A5AA5;
-    }
-    .file-name {
-        font-weight: 600;
-        color: #111827;
-        font-size: 1rem;
-        flex: 1;
-    }
+    .file-name { font-weight: 600; color: #111827; font-size: 1rem; flex: 1; }
     
-    /* Separador */
-    .section-divider {
-        margin: 1.5rem 2rem;
-        border-top: 2px solid #e5e7eb;
-    }
+    .section-divider { margin: 1.5rem 2rem; border-top: 2px solid #e5e7eb; }
     
-    /* Formulário section */
     .form-section {
         padding: 2rem;
         background: white;
         border-top: 3px solid #0A5AA5;
-    }
-    .form-header {
-        margin-bottom: 1.5rem;
     }
     .form-title {
         font-size: 1.4rem;
@@ -313,19 +212,13 @@ st.markdown("""
         color: #0A5AA5;
         margin: 0 0 0.5rem 0;
     }
-    .form-message {
-        color: #64748b;
-        font-size: 0.9rem;
-        margin: 0;
-    }
+    .form-message { color: #64748b; font-size: 0.9rem; margin: 0; }
     
-    /* Streamlit buttons */
     .stButton > button {
         border-radius: 10px;
         font-weight: 700;
         font-size: 1rem;
         padding: 0.875rem 2rem;
-        transition: all 0.2s ease;
     }
     .stButton > button[kind="primary"] {
         background: #0A5AA5;
@@ -333,18 +226,10 @@ st.markdown("""
         border: none;
         height: 52px;
     }
-    .stButton > button[kind="primary"]:hover {
-        background: #084a8a;
-        transform: translateY(-2px);
-    }
     .stButton > button[kind="secondary"] {
         background: white;
         color: #FF6C12;
         border: 2px solid #FF6C12;
-    }
-    .stButton > button[kind="secondary"]:hover {
-        background: #FF6C12;
-        color: white;
     }
     .stButton > button[kind="tertiary"] {
         background: white;
@@ -352,7 +237,6 @@ st.markdown("""
         border: 2px solid #e5e7eb;
     }
     
-    /* Form inputs */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
     .stSelectbox > div > div > div {
@@ -362,42 +246,21 @@ st.markdown("""
         font-size: 1rem;
         height: 52px;
     }
-    .stTextInput > div > div > input:focus,
-    .stTextArea > div > div > textarea:focus {
-        border-color: #0A5AA5;
-        box-shadow: 0 0 0 3px rgba(10, 90, 165, 0.1);
-    }
     
-    /* Expander */
     .stExpander {
         border: none;
         border-radius: 16px;
         margin-bottom: 1rem;
         background: transparent;
-        box-shadow: none;
     }
     
-    label {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #111827;
-        margin-bottom: 0.5rem;
-    }
-    
-    h3, h4 {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #111827;
-    }
+    label { font-size: 0.95rem; font-weight: 600; color: #111827; }
+    h3, h4 { font-size: 1.3rem; font-weight: 700; color: #111827; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÕES AUXILIARES ---
 def encontrar_tabela(nome_tabela):
-    response = notion.search(
-        query=nome_tabela,
-        filter={"value": "database", "property": "object"}
-    )
+    response = notion.search(query=nome_tabela, filter={"value": "database", "property": "object"})
     resultados = response.get("results", [])
     if resultados:
         return resultados[0]["id"]
@@ -456,18 +319,10 @@ def baixar_arquivo_notion(url):
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        
-        req = urllib.request.Request(
-            url,
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept': '*/*',
-                'Accept-Language': 'pt-BR,pt;q=0.9',
-            }
-        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0', 'Accept': '*/*'})
         with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
             return response.read()
-    except Exception as e:
+    except:
         return None
 
 def get_opcoes_select(db_info, coluna_nome):
@@ -479,7 +334,6 @@ def get_opcoes_select(db_info, coluna_nome):
         return [opt.get("name") for opt in options if opt.get("name")]
     return []
 
-# --- INICIALIZAÇÃO ---
 notion = Client(auth=NOTION_TOKEN)
 
 id_projetos = encontrar_tabela("Projetos")
@@ -492,7 +346,6 @@ if not all([id_projetos, id_cenarios, id_analises]):
 
 db_info_analises = notion.databases.retrieve(database_id=id_analises)
 
-# --- SIDEBAR ---
 with st.sidebar:
     st.markdown("### Compliance Tributário")
     st.markdown("---")
@@ -510,12 +363,7 @@ with st.sidebar:
                 lista_projetos.append({"id": proj["id"], "nome": nome_proj})
             
             st.markdown("**Projetos**")
-            projeto_escolhido = st.selectbox(
-                "Selecione o projeto:",
-                options=lista_projetos,
-                format_func=lambda x: x["nome"],
-                label_visibility="collapsed"
-            )
+            projeto_escolhido = st.selectbox("Selecione o projeto:", options=lista_projetos, format_func=lambda x: x["nome"], label_visibility="collapsed")
             
             if projeto_escolhido:
                 st.markdown("---")
@@ -525,7 +373,6 @@ with st.sidebar:
     except Exception as e:
         st.error(f"Erro: {e}")
 
-# --- ÁREA PRINCIPAL ---
 if 'projeto_escolhido' in dir() and projeto_escolhido:
     st.markdown(f"""
     <div class="header">
@@ -535,20 +382,13 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
     """, unsafe_allow_html=True)
     
     try:
-        cenarios_response = notion.databases.query(
-            database_id=id_cenarios,
-            filter={
-                "property": "Projeto",
-                "relation": {"contains": projeto_escolhido["id"]}
-            }
-        )
+        cenarios_response = notion.databases.query(database_id=id_cenarios, filter={"property": "Projeto", "relation": {"contains": projeto_escolhido["id"]}})
         cenarios = cenarios_response.get("results", [])
         
         if not cenarios:
             st.info("Nenhum cenário encontrado para este projeto.")
         else:
             todas_props = db_info_analises.get("properties", {})
-            
             coluna_titulo_analise = encontrar_coluna_title(todas_props)
             
             nomes_colunas = {
@@ -580,7 +420,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
             
             for cenario in cenarios:
                 props = cenario.get("properties", {})
-                
                 col_titulo_cenario = encontrar_coluna_title(props)
                 nome_cenario = get_titulo_safe(props, col_titulo_cenario)
                 status = get_status_safe(props, "Status")
@@ -596,7 +435,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif arquivo.get("file", {}).get("url"):
                                 anexos.append({"nome": arquivo.get("name", "Arquivo"), "url": arquivo["file"]["url"]})
                 
-                # Badge de status
                 if status == "Aprovado":
                     badge_html = '<span class="status-badge status-aprovado">Aprovado</span>'
                 elif status == "Reprovado":
@@ -604,9 +442,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                 else:
                     badge_html = '<span class="status-badge status-pendente">Pronto para análise</span>'
                 
-                # EXPANDER DO CENÁRIO
                 with st.expander(nome_cenario, expanded=False):
-                    # Header do cenário
                     st.markdown(f"""
                     <div class="scenario-container">
                         <div class="scenario-header">
@@ -616,7 +452,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # Info section - RESPONSÁVEL E STATUS
                     st.markdown(f"""
                     <div class="info-section">
                         <div class="info-grid">
@@ -632,60 +467,31 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # ANEXOS
                     if anexos:
                         titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
-                        
                         st.markdown(f"""
                         <div class="files-section">
                             <div class="files-label">{titulo_anexos} ({len(anexos)})</div>
-                            <div class="files-message">
-                                Baixe os documentos abaixo para revisar antes de registrar sua análise.
-                            </div>
+                            <div class="files-message">Baixe os documentos abaixo para revisar antes de registrar sua análise.</div>
                         </div>
                         """, unsafe_allow_html=True)
                         
                         for idx, arquivo in enumerate(anexos):
                             conteudo = baixar_arquivo_notion(arquivo['url'])
-                            
                             if conteudo:
                                 col_nome, col_btn = st.columns([4, 1])
-                                
                                 with col_nome:
-                                    st.markdown(f"""
-                                    <div class="file-row" style="margin-bottom: 0;">
-                                        <div class="file-name">{arquivo['nome']}</div>
-                                    </div>
-                                    """, unsafe_allow_html=True)
-                                
+                                    st.markdown(f'<div class="file-row" style="margin-bottom: 0;"><div class="file-name">{arquivo["nome"]}</div></div>', unsafe_allow_html=True)
                                 with col_btn:
-                                    st.download_button(
-                                        label="Baixar",
-                                        data=conteudo,
-                                        file_name=arquivo['nome'],
-                                        mime="application/octet-stream",
-                                        key=f"download_{cenario['id']}_{idx}",
-                                        type="tertiary",
-                                        use_container_width=True
-                                    )
+                                    st.download_button(label="Baixar", data=conteudo, file_name=arquivo['nome'], mime="application/octet-stream", key=f"download_{cenario['id']}_{idx}", type="tertiary", use_container_width=True)
                             else:
-                                st.markdown(f"""
-                                <div class="file-row">
-                                    <div class="file-name">{arquivo['nome']}</div>
-                                    <a href="{arquivo['url']}" target="_blank" style="background: white; color: #FF6C12; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid #FF6C12; display: inline-block;">
-                                        Abrir
-                                    </a>
-                                </div>
-                                """, unsafe_allow_html=True)
-                            
+                                st.markdown(f'<div class="file-row"><div class="file-name">{arquivo["nome"]}</div><a href="{arquivo["url"]}" target="_blank" style="background: white; color: #FF6C12; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid #FF6C12;">Abrir</a></div>', unsafe_allow_html=True)
                             st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
                     else:
                         st.info("Nenhum anexo disponível")
                     
-                    # Separador
                     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
                     
-                    # FORMULÁRIO - Botão "Fazer análise"
                     st.markdown("""
                     <div class="form-section">
                         <div class="form-header">
@@ -697,27 +503,12 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                     
                     with st.form(key=f"form_analise_{cenario['id']}"):
                         col_f1, col_f2 = st.columns(2)
-                        
                         with col_f1:
                             nome_input = st.text_input("Analista responsável", placeholder="Ex: João Silva")
-                            setor_input = st.selectbox(
-                                "Setor",
-                                options=[""] + opcoes_setor,
-                                format_func=lambda x: "Selecione o setor" if x == "" else x,
-                                index=0
-                            )
-                        
+                            setor_input = st.selectbox("Setor", options=[""] + opcoes_setor, format_func=lambda x: "Selecione o setor" if x == "" else x, index=0)
                         with col_f2:
-                            status_input = st.selectbox(
-                                "Status",
-                                options=[""] + opcoes_status,
-                                format_func=lambda x: "Selecione o status" if x == "" else x,
-                                index=0
-                            )
-                            motivo_input = st.text_area(
-                                "Motivo (obrigatório se reprovado)",
-                                placeholder="Explique o motivo da reprovação..."
-                            )
+                            status_input = st.selectbox("Status", options=[""] + opcoes_status, format_func=lambda x: "Selecione o status" if x == "" else x, index=0)
+                            motivo_input = st.text_area("Motivo (obrigatório se reprovado)", placeholder="Explique o motivo da reprovação...")
                         
                         submit = st.form_submit_button("Salvar análise", type="primary", use_container_width=True)
                         
@@ -731,15 +522,7 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                             elif status_input == "Reprovado" and not motivo_input:
                                 st.error("Informe o motivo da reprovação.")
                             else:
-                                # Verificar se este setor já analisou
-                                analises_existentes = notion.databases.query(
-                                    database_id=id_analises,
-                                    filter={
-                                        "property": col_relation,
-                                        "relation": {"contains": cenario["id"]}
-                                    }
-                                )
-                                
+                                analises_existentes = notion.databases.query(database_id=id_analises, filter={"property": col_relation, "relation": {"contains": cenario["id"]}})
                                 setor_ja_analisou = False
                                 for analise_existente in analises_existentes.get("results", []):
                                     a_props = analise_existente.get("properties", {})
@@ -753,12 +536,9 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 else:
                                     try:
                                         data_hoje = datetime.now().strftime("%Y-%m-%d")
-                                        
                                         propriedades = {}
-                                        
                                         if coluna_titulo_analise:
                                             propriedades[coluna_titulo_analise] = {"title": [{"text": {"content": nome_input}}]}
-                                        
                                         if colunas_reais.get("setor"):
                                             propriedades[colunas_reais["setor"]] = {"select": {"name": setor_input}}
                                         if colunas_reais.get("status"):
@@ -775,6 +555,5 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                         st.rerun()
                                     except Exception as e:
                                         st.error(f"Erro ao salvar: {e}")
-    
     except Exception as e:
         st.error(f"Erro: {e}")
