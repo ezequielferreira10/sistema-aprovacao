@@ -6,27 +6,12 @@ import ssl
 
 NOTION_TOKEN = "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"
 
-st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Compliance Tributário", page_icon="️", layout="wide")
 
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    /* ESCONDER STREAMLIT */
-    header[data-testid="stHeader"] { display: none !important; }
-    [data-testid="stToolbar"] { display: none !important; }
-    footer { display: none !important; }
-
-    /* ESSA É A NOVA QUE ESCONDE O BOTÃO FLUTUANTE DO CANTO */
-    [data-testid="stFloatingActionButton"],
-    .stApp > div:last-child,
-    #streamlit-deploy-button {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-    }
-
     * { box-sizing: border-box; }
     
     body {
