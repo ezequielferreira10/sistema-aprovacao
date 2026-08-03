@@ -5,14 +5,6 @@ import urllib.request
 import ssl
 
 NOTION_TOKEN = "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"
-import streamlit as st
-from notion_client import Client
-from datetime import datetime
-import urllib.request
-import ssl
-
-# --- CONFIGURAÇÕES ---
-NOTION_TOKEN = "ntn_SEU_TOKEN_REAL_AQUI"
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
