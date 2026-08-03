@@ -21,19 +21,88 @@ st.markdown("""
         font-size: 14px;
     }
     
-    /* Sidebar */
+    /* Sidebar - Estilo Premium */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0A5AA5 0%, #084a8a 100%);
-        padding: 2rem 1.5rem;
+        background: linear-gradient(180deg, #0A5AA5 0%, #0c4a8a 100%);
+        padding: 2.5rem 1.5rem;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
     }
-    [data-testid="stSidebar"] * { color: white !important; }
-    [data-testid="stSidebar"] .stSelectbox > div > div > div {
-        background-color: white !important;
-    }
-    [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
-        color: #000000 !important;
+    [data-testid="stSidebar"] * { 
+        color: white !important; 
     }
     
+    /* Título da sidebar */
+    [data-testid="stSidebar"] h3 {
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 2rem !important;
+        padding-bottom: 1rem !important;
+        border-bottom: 2px solid rgba(255,255,255,0.2) !important;
+        letter-spacing: -0.5px !important;
+    }
+    
+    /* Label "Projetos" */
+    [data-testid="stSidebar"] > div:nth-child(3) {
+        margin-top: 2rem !important;
+    }
+    
+    [data-testid="stSidebar"] .stMarkdown {
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1.5px !important;
+        color: rgba(255,255,255,0.7) !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Selectbox - mais elegante */
+    [data-testid="stSidebar"] .stSelectbox > div > div > div {
+        background-color: rgba(255,255,255,0.95) !important;
+        border-radius: 10px !important;
+        border: 2px solid rgba(255,255,255,0.3) !important;
+        padding: 0.75rem 1rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    [data-testid="stSidebar"] .stSelectbox > div > div > div:hover {
+        border-color: rgba(255,255,255,0.6) !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    
+    [data-testid="stSidebar"] .stSelectbox > div > div > div > div {
+        color: #0A5AA5 !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Projeto selecionado - CARD BONITO */
+    [data-testid="stSidebar"] .stSuccess {
+        background: rgba(255,255,255,0.15) !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        border-radius: 12px !important;
+        padding: 1rem 1.25rem !important;
+        margin-top: 1rem !important;
+        backdrop-filter: blur(10px) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    [data-testid="stSidebar"] .stSuccess:hover {
+        background: rgba(255,255,255,0.25) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+    }
+    
+    [data-testid="stSidebar"] .stSuccess p {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        margin: 0 !important;
+    }
+    
+    /* Divider */
+    [data-testid="stSidebar"] hr {
+        border-color: rgba(255,255,255,0.2) !important;
+        margin: 1.5rem 0 !important;
+    }    
     /* Main */
     .main {
         background-color: #f1f5f9;
