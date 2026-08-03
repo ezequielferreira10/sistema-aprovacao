@@ -13,38 +13,24 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
+    /* 1. RESET E BASE */
     * { box-sizing: border-box; }
-
-    /* Esconde a barra superior do Streamlit */
-header[data-testid="stHeader"] {
-    display: none !important;
-}
-
-/* Esconde o menu "Manage app" */
-[data-testid="stToolbar"] {
-    display: none !important;
-}
-
-/* Esconde o footer "Made with Streamlit" */
-footer[data-testid="stFooter"] {
-    display: none !important;
-}
     
+    /* 2. ESCONDER ELEMENTOS DO STREAMLIT (FORÇADO) */
+    header[data-testid="stHeader"] { display: none !important; }
+    [data-testid="stToolbar"] { display: none !important; }
+    footer { visibility: hidden !important; }
+    footer::after { content: "" !important; visibility: hidden !important; }
+    [data-testid="stFloatingActionButton"] { display: none !important; }
+    .stApp > header { display: none !important; }
+    
+    /* 3. ESTILOS GERAIS */
     body {
         background-color: #f1f5f9;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         font-size: 14px;
+        color: #111827;
     }
-
-    /* Esconde o botão flutuante "Gerenciar aplicativo" */
-[data-testid="stFloatingActionButton"] {
-    display: none !important;
-}
-
-/* Esconde qualquer botão de gerenciamento */
-.stApp > div:last-child {
-    display: none !important;
-}
     
     /* Sidebar - Estilo Premium */
     [data-testid="stSidebar"] {
@@ -128,6 +114,7 @@ footer[data-testid="stFooter"] {
         border-color: rgba(255,255,255,0.2) !important;
         margin: 1.5rem 0 !important;
     }    
+    
     /* Main */
     .main {
         background-color: #f1f5f9;
