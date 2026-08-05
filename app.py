@@ -12,6 +12,7 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
+    /* Esconde elementos padrão do Streamlit */
     header[data-testid="stHeader"] { display: none !important; }
     [data-testid="stToolbar"] { display: none !important; }
     footer { display: none !important; }
@@ -419,15 +420,9 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                 else:
                     badge_html = '<span class="status-badge status-pendente">Pronto para análise</span>'
                 
+                # Usando st.container para evitar conflitos de renderização do HTML
                 with st.expander(nome_cenario, expanded=False):
-                    st.markdown(f"""
-                    <div class="scenario-container">
-                        <div class="scenario-header">
-                            <div class="scenario-title">{nome_cenario}</div>
-                            {badge_html}
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div class="scenario-container"><div class="scenario-header"><div class="scenario-title">{nome_cenario}</div>{badge_html}</div></div>', unsafe_allow_html=True)
                     
                     st.markdown(f"""
                     <div class="info-section">
