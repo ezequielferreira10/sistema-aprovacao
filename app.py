@@ -3,8 +3,10 @@ from notion_client import Client
 from datetime import datetime
 import urllib.request
 import ssl
+import os
 
-NOTION_TOKEN = "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"
+# Pega o token das Variáveis do Railway. Se não achar, usa o padrão (para testes)
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN", "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")
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
@@ -233,6 +235,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def encontrar_tabela(nome_tabela):
+    # ESTA É A CORREÇÃO: "database" e "object" DEVEM ESTAR EM INGLÊS
     response = notion.search(query=nome_tabela, filter={"value": "database", "property": "object"})
     resultados = response.get("results", [])
     if resultados:
@@ -345,7 +348,7 @@ with st.sidebar:
             
             if projeto_escolhido:
                 st.markdown("---")
-                st.success(f" {projeto_escolhido['nome']}")
+                st.success(f"✅ {projeto_escolhido['nome']}")
         else:
             st.warning("Nenhum projeto encontrado.")
     except Exception as e:
@@ -420,7 +423,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                 else:
                     badge_html = '<span class="status-badge status-pendente">Pronto para análise</span>'
                 
-                # Usando st.container para evitar conflitos de renderização do HTML
                 with st.expander(nome_cenario, expanded=False):
                     st.markdown(f'<div class="scenario-container"><div class="scenario-header"><div class="scenario-title">{nome_cenario}</div>{badge_html}</div></div>', unsafe_allow_html=True)
                     
