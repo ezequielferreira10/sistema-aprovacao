@@ -14,7 +14,6 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    /* Esconde elementos padrão do Streamlit */
     header[data-testid="stHeader"] { display: none !important; }
     [data-testid="stToolbar"] { display: none !important; }
     footer { display: none !important; }
@@ -235,9 +234,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def encontrar_tabela(nome_tabela):
-    # ESTA É A CORREÇÃO: "database" e "object" DEVEM ESTAR EM INGLÊS
-    response = notion.search(query=nome_tabela, filter={"value": "database", "property": "object"})
+    # CORREÇÃO CRÍTICA: A API do Notion exige "data_source" e NÃO "database" na busca!
+    response = notion.search(
+        query=nome_tabela, 
+        filter={"property": "object", "value": "data_source"}
+    )
     resultados = response.get("results", [])
+    
+    # Tenta achar pelo nome exato para evitar pegar o banco de dados errado
+    for resultado in resultados:
+        if "title" in resultado and len(resultado["title"]) > 0:
+            if resultado["title"][0].get("plain_text") == nome_tabela:
+                return resultado["id"]
+        elif "properties" in resultado and "title" in resultado["properties"]:
+            props = resultado["properties"]["title"].get("title", [])
+            if props and len(props) > 0 and props[0].get("plain_text") == nome_tabela:
+                return resultado["id"]
+                
+    # Fallback: se não achar pelo nome exato, retorna o primeiro encontrado
     if resultados:
         return resultados[0]["id"]
     return None
@@ -317,7 +331,7 @@ id_cenarios = encontrar_tabela("Cenário")
 id_analises = encontrar_tabela("Análises")
 
 if not all([id_projetos, id_cenarios, id_analises]):
-    st.error("Tabelas não encontradas no Notion.")
+    st.error("Tabelas não encontradas no Notion. Verifique se a integração tem acesso a elas.")
     st.stop()
 
 db_info_analises = notion.databases.retrieve(database_id=id_analises)
