@@ -10,6 +10,9 @@ NOTION_TOKEN = os.environ.get("NOTION_TOKEN", "ntn_198851673353AKuTD5t08XMQsp9gT
 
 st.set_page_config(page_title="Compliance Tributário", page_icon="🏛️", layout="wide")
 
+# ✅ NOVA LINHA: Impede o navegador de traduzir a página automaticamente
+st.markdown('<meta name="google" content="notranslate">', unsafe_allow_html=True)
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -205,11 +208,6 @@ st.markdown("""
         color: #FF6C12;
         border: 2px solid #FF6C12;
     }
-    .stButton > button[kind="tertiary"] {
-        background: white;
-        color: #64748b;
-        border: 2px solid #e5e7eb;
-    }
     
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
@@ -234,14 +232,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def encontrar_tabela(nome_tabela):
-    # CORREÇÃO CRÍTICA: A API do Notion exige "data_source" e NÃO "database" na busca!
     response = notion.search(
         query=nome_tabela, 
         filter={"property": "object", "value": "data_source"}
     )
     resultados = response.get("results", [])
     
-    # Tenta achar pelo nome exato para evitar pegar o banco de dados errado
     for resultado in resultados:
         if "title" in resultado and len(resultado["title"]) > 0:
             if resultado["title"][0].get("plain_text") == nome_tabela:
@@ -251,7 +247,6 @@ def encontrar_tabela(nome_tabela):
             if props and len(props) > 0 and props[0].get("plain_text") == nome_tabela:
                 return resultado["id"]
                 
-    # Fallback: se não achar pelo nome exato, retorna o primeiro encontrado
     if resultados:
         return resultados[0]["id"]
     return None
@@ -471,7 +466,6 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 with col_nome:
                                     st.markdown(f'<div class="file-row" style="margin-bottom: 0;"><div class="file-name">{arquivo["nome"]}</div></div>', unsafe_allow_html=True)
                                 with col_btn:
-                                    # ✅ CORREÇÃO: Trocado type="tertiary" por type="secondary"
                                     st.download_button(label="Baixar", data=conteudo, file_name=arquivo['nome'], mime="application/octet-stream", key=f"download_{cenario['id']}_{idx}", type="secondary", use_container_width=True)
                             else:
                                 st.markdown(f'<div class="file-row"><div class="file-name">{arquivo["nome"]}</div><a href="{arquivo["url"]}" target="_blank" style="background: white; color: #FF6C12; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid #FF6C12;">Abrir</a></div>', unsafe_allow_html=True)
