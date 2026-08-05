@@ -471,7 +471,8 @@ if 'projeto_escolhido' in dir() and projeto_escolhido:
                                 with col_nome:
                                     st.markdown(f'<div class="file-row" style="margin-bottom: 0;"><div class="file-name">{arquivo["nome"]}</div></div>', unsafe_allow_html=True)
                                 with col_btn:
-                                    st.download_button(label="Baixar", data=conteudo, file_name=arquivo['nome'], mime="application/octet-stream", key=f"download_{cenario['id']}_{idx}", type="tertiary", use_container_width=True)
+                                    # ✅ CORREÇÃO: Trocado type="tertiary" por type="secondary"
+                                    st.download_button(label="Baixar", data=conteudo, file_name=arquivo['nome'], mime="application/octet-stream", key=f"download_{cenario['id']}_{idx}", type="secondary", use_container_width=True)
                             else:
                                 st.markdown(f'<div class="file-row"><div class="file-name">{arquivo["nome"]}</div><a href="{arquivo["url"]}" target="_blank" style="background: white; color: #FF6C12; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none; font-weight: 600; border: 2px solid #FF6C12;">Abrir</a></div>', unsafe_allow_html=True)
                             st.markdown("<div style='margin-bottom: 0.5rem;'></div>", unsafe_allow_html=True)
