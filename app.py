@@ -6,6 +6,7 @@ import textwrap
 import ssl
 import os
 import html
+import json
 
 
 # ============================================================
@@ -29,12 +30,8 @@ st.set_page_config(
 
 
 # ============================================================
-# RENDERIZAÇÃO DE HTML (CORREÇÃO DEFINITIVA)
+# RENDERIZAÇÃO DE HTML (à prova de bloco de código)
 # ============================================================
-# 1) dedent remove a indentação comum
-# 2) strip() zera a indentação de CADA linha
-# 3) linhas em branco são removidas
-# Isso impede o Markdown de interpretar o HTML como bloco de código.
 
 def render_html(conteudo):
     conteudo = textwrap.dedent(conteudo)
@@ -44,11 +41,12 @@ def render_html(conteudo):
 
 
 # ============================================================
-# CSS
+# CSS + ANTI-TRADUÇÃO AUTOMÁTICA
 # ============================================================
 
 render_html(
     """
+    <meta name="google" content="notranslate">
     <style>
 
     .stApp { background-color: #f4f7fb; }
@@ -62,6 +60,8 @@ render_html(
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     header { visibility: hidden; }
+
+    /* ---------- SIDEBAR ---------- */
 
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0f5b9f 0%, #125d9f 100%);
@@ -105,11 +105,13 @@ render_html(
 
     .project-icon { margin-right: 0.4rem; }
 
+    /* ---------- CABEÇALHO ---------- */
+
     .page-header {
         background: linear-gradient(135deg, #0f5b9f 0%, #155f9f 100%);
         border-radius: 18px;
         padding: 2.4rem 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.6rem;
         box-shadow: 0 8px 25px rgba(15, 91, 159, 0.12);
     }
 
@@ -129,6 +131,40 @@ render_html(
         margin-top: 0.55rem;
     }
 
+    /* ---------- RESUMO (CARDS) ---------- */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.8rem;
+        margin-bottom: 1.6rem;
+    }
+
+    .summary-card {
+        background: white;
+        border: 1px solid #e3e8ee;
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        text-align: center;
+        box-shadow: 0 3px 12px rgba(20, 40, 60, 0.04);
+    }
+
+    .summary-number { font-size: 1.6rem; font-weight: 800; }
+    .num-blue { color: #0f5b9f; }
+    .num-green { color: #247043; }
+    .num-red { color: #a33a3a; }
+
+    .summary-label {
+        color: #7a8794;
+        font-size: 0.68rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 0.15rem;
+    }
+
+    /* ---------- SEÇÕES ---------- */
+
     .section-label {
         color: #5c6b7a;
         font-size: 0.72rem;
@@ -139,27 +175,12 @@ render_html(
         margin-bottom: 0.65rem;
     }
 
-    .scenario-container {
-        background: white;
-        border: 1px solid #e3e8ee;
-        border-radius: 14px;
-        padding: 1.25rem 1.35rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 3px 12px rgba(20, 40, 60, 0.04);
-    }
+    /* ---------- BADGE / STATUS ---------- */
 
-    .scenario-header {
+    .badge-row {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-
-    .scenario-title {
-        color: #075da8;
-        font-size: 1.35rem;
-        font-weight: 750;
-        letter-spacing: -0.25px;
+        justify-content: flex-end;
+        margin: 0 0 0.7rem 0;
     }
 
     .status-badge {
@@ -179,11 +200,13 @@ render_html(
     .status-aprovado { color: #247043; background: #edf8f1; border: 1px solid #b9dec5; }
     .status-reprovado { color: #a33a3a; background: #fff0f0; border: 1px solid #e8bcbc; }
 
+    /* ---------- INFORMAÇÕES ---------- */
+
     .info-section {
         background: #f8fafc;
         border-radius: 10px;
         padding: 1rem 1.1rem;
-        margin-top: 0.8rem;
+        margin-top: 0.4rem;
     }
 
     .info-grid {
@@ -208,6 +231,8 @@ render_html(
         font-size: 0.93rem;
         font-weight: 600;
     }
+
+    /* ---------- ANEXOS ---------- */
 
     .files-section { margin-top: 1.3rem; margin-bottom: 0.7rem; }
 
@@ -238,6 +263,58 @@ render_html(
         text-overflow: ellipsis;
     }
 
+    /* ---------- ANÁLISES REGISTRADAS ---------- */
+
+    .analyses-section { margin-top: 1.2rem; }
+
+    .analyses-title {
+        color: #26384a;
+        font-size: 0.9rem;
+        font-weight: 750;
+        margin-bottom: 0.4rem;
+    }
+
+    .analysis-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        background: white;
+        border: 1px solid #e3e8ee;
+        border-radius: 10px;
+        padding: 0.65rem 0.85rem;
+        margin-top: 0.45rem;
+    }
+
+    .analysis-main { min-width: 0; }
+
+    .analysis-setor {
+        color: #243447;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .analysis-meta {
+        color: #7a8794;
+        font-size: 0.75rem;
+        margin-top: 0.1rem;
+    }
+
+    .analysis-motivo {
+        color: #a33a3a;
+        font-size: 0.78rem;
+        font-style: italic;
+        margin-top: 0.25rem;
+    }
+
+    .analysis-empty {
+        color: #7a8794;
+        font-size: 0.8rem;
+        font-style: italic;
+    }
+
+    /* ---------- FORMULÁRIO ---------- */
+
     .section-divider { height: 1px; background: #e5e9ee; margin: 1.5rem 0; }
 
     .form-section { margin-bottom: 1rem; }
@@ -250,6 +327,30 @@ render_html(
     }
 
     .form-message { color: #748292; font-size: 0.82rem; margin: 0; }
+
+    /* ---------- BOTÃO AZUL (identidade) ---------- */
+
+    div.stButton > button[kind="primary"],
+    div.stForm button[kind="primary"] {
+        background: #0f5b9f !important;
+        border-color: #0f5b9f !important;
+        color: #ffffff !important;
+    }
+
+    div.stButton > button[kind="primary"]:hover,
+    div.stForm button[kind="primary"]:hover {
+        background: #0d4f8b !important;
+        border-color: #0d4f8b !important;
+    }
+
+    input:focus,
+    textarea:focus,
+    div[data-baseweb="select"] > div:focus-within {
+        border-color: #0f5b9f !important;
+        box-shadow: 0 0 0 1px #0f5b9f !important;
+    }
+
+    /* ---------- INPUTS / EXPANDER ---------- */
 
     div[data-baseweb="select"] > div { border-radius: 8px; }
     div[data-testid="stTextInput"] input,
@@ -266,10 +367,12 @@ render_html(
     }
     div[data-testid="stExpander"] summary:hover { border-color: #a9c9e4; }
 
+    /* ---------- RESPONSIVO ---------- */
+
     @media (max-width: 800px) {
         .page-title { font-size: 1.8rem; }
         .info-grid { grid-template-columns: 1fr; }
-        .scenario-header { flex-direction: column; align-items: flex-start; }
+        .summary-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     </style>
@@ -278,9 +381,10 @@ render_html(
 
 
 # ============================================================
-# FUNÇÕES DO NOTION
+# CACHE (velocidade + proteção de rate limit do Notion)
 # ============================================================
 
+@st.cache_data(ttl=300)
 def encontrar_tabela(nome_tabela):
     try:
         response = notion.search(query=nome_tabela)
@@ -302,6 +406,41 @@ def encontrar_tabela(nome_tabela):
         return None
 
 
+@st.cache_data(ttl=60)
+def notion_query(db_id, filtro_json=""):
+    if filtro_json:
+        return notion.databases.query(
+            database_id=db_id,
+            filter=json.loads(filtro_json)
+        )
+    return notion.databases.query(database_id=db_id)
+
+
+@st.cache_data(ttl=60)
+def notion_db_info(db_id):
+    return notion.databases.retrieve(database_id=db_id)
+
+
+@st.cache_data(ttl=300)
+def baixar_arquivo_notion(url):
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"}
+        )
+        with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
+            return response.read()
+    except Exception:
+        return None
+
+
+# ============================================================
+# FUNÇÕES AUXILIARES
+# ============================================================
+
 def encontrar_coluna_title(props):
     for prop_name, prop_info in props.items():
         if prop_info.get("type") == "title":
@@ -317,6 +456,16 @@ def encontrar_coluna(props, nomes_possiveis):
     for nome in nomes_possiveis:
         if nome.lower() in props_lower:
             return props_lower[nome.lower()]
+    return None
+
+
+def encontrar_coluna_data(props):
+    nomes = ["data", "date", "atualização", "atualizacao",
+             "atualizado em", "última atualização"]
+    for prop_name, prop_info in props.items():
+        if prop_info.get("type") == "date":
+            if prop_name.strip().lower() in nomes:
+                return prop_name
     return None
 
 
@@ -347,6 +496,34 @@ def get_titulo_safe(props, coluna_nome):
     return "Sem nome"
 
 
+def get_texto_safe(props, coluna_nome):
+    if not coluna_nome or coluna_nome not in props:
+        return ""
+    col = props[coluna_nome]
+    if not isinstance(col, dict):
+        return ""
+    textos = col.get("rich_text", [])
+    if textos:
+        return textos[0].get("plain_text", "")
+    return ""
+
+
+def get_date_safe(props, coluna_nome):
+    if not coluna_nome or coluna_nome not in props:
+        return ""
+    col = props[coluna_nome]
+    if not isinstance(col, dict):
+        return ""
+    date = col.get("date")
+    if isinstance(date, dict) and date.get("start"):
+        start = date["start"]
+        if len(start) >= 10:
+            d = start[:10].split("-")
+            return f"{d[2]}/{d[1]}/{d[0]}"
+        return start
+    return ""
+
+
 def get_people_safe(props, coluna_nome):
     if not coluna_nome or coluna_nome not in props:
         return "Não definido"
@@ -363,21 +540,6 @@ def get_people_safe(props, coluna_nome):
         if email:
             return email
     return "Não definido"
-
-
-def baixar_arquivo_notion(url):
-    try:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        req = urllib.request.Request(
-            url,
-            headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"}
-        )
-        with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
-            return response.read()
-    except Exception:
-        return None
 
 
 def get_opcoes_select(db_info, coluna_nome):
@@ -402,6 +564,25 @@ def criar_propriedade_opcao(tipo, valor):
     return {"select": {"name": valor}}
 
 
+def badge_para(status, texto_pendente="Pronto para análise"):
+    s = str(status).strip().lower()
+    if s == "aprovado":
+        return '<span class="status-badge status-aprovado">Aprovado</span>'
+    if s == "reprovado":
+        return '<span class="status-badge status-reprovado">Reprovado</span>'
+    texto = html.escape(texto_pendente)
+    return f'<span class="status-badge status-pendente">{texto}</span>'
+
+
+def emoji_status(status):
+    s = str(status).strip().lower()
+    if s == "aprovado":
+        return "✅"
+    if s == "reprovado":
+        return "❌"
+    return "⏳"
+
+
 # ============================================================
 # LOCALIZAR DATABASES
 # ============================================================
@@ -423,7 +604,7 @@ if not id_analises:
     st.stop()
 
 try:
-    db_info_analises = notion.databases.retrieve(database_id=id_analises)
+    db_info_analises = notion_db_info(id_analises)
 except Exception as e:
     st.error(f"Não foi possível acessar a tabela de Análises: {e}")
     st.stop()
@@ -440,7 +621,7 @@ with st.sidebar:
     render_html('<div class="sidebar-label">Projetos</div>')
 
     try:
-        projetos_response = notion.databases.query(database_id=id_projetos)
+        projetos_response = notion_query(id_projetos)
         projetos = projetos_response.get("results", [])
         lista_projetos = []
 
@@ -494,13 +675,11 @@ if projeto_escolhido:
     )
 
     try:
-        cenarios_response = notion.databases.query(
-            database_id=id_cenarios,
-            filter={
-                "property": "Projeto",
-                "relation": {"contains": projeto_escolhido["id"]}
-            }
-        )
+        filtro_cenarios = json.dumps({
+            "property": "Projeto",
+            "relation": {"contains": projeto_escolhido["id"]}
+        })
+        cenarios_response = notion_query(id_cenarios, filtro_cenarios)
         cenarios = cenarios_response.get("results", [])
     except Exception as e:
         st.error(f"Erro ao carregar os cenários: {e}")
@@ -560,13 +739,57 @@ if projeto_escolhido:
         if not opcoes_status:
             opcoes_status = ["Aprovado", "Reprovado", "Em Análise"]
 
+        # ====================================================
+        # RESUMO DO PROJETO
+        # ====================================================
+
+        total_cenarios = len(cenarios)
+        total_aprovados = 0
+        total_reprovados = 0
+
+        for c in cenarios:
+            c_props = c.get("properties", {})
+            c_col_status = encontrar_coluna(
+                c_props, ["Status", "Situação", "Situacao"]
+            )
+            c_status = str(get_status_safe(c_props, c_col_status)).strip().lower()
+            if c_status == "aprovado":
+                total_aprovados += 1
+            elif c_status == "reprovado":
+                total_reprovados += 1
+
+        total_pendentes = total_cenarios - total_aprovados - total_reprovados
+
+        render_html(
+            f"""
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-number num-blue">{total_cenarios}</div>
+                    <div class="summary-label">Cenários</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number num-green">{total_aprovados}</div>
+                    <div class="summary-label">Aprovados</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number num-red">{total_reprovados}</div>
+                    <div class="summary-label">Reprovados</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number num-blue">{total_pendentes}</div>
+                    <div class="summary-label">Pendentes</div>
+                </div>
+            </div>
+            """
+        )
+
         render_html('<div class="section-label">Cenários</div>')
 
         # ====================================================
         # LOOP DOS CENÁRIOS
         # ====================================================
 
-        for cenario in cenarios:
+        for idx_cenario, cenario in enumerate(cenarios):
 
             props = cenario.get("properties", {})
 
@@ -583,6 +806,9 @@ if projeto_escolhido:
                 props, ["Responsável", "Responsavel"]
             )
             responsavel = get_people_safe(props, coluna_responsavel)
+
+            coluna_data_cenario = encontrar_coluna_data(props)
+            data_cenario = get_date_safe(props, coluna_data_cenario)
 
             anexos = []
             coluna_anexos = encontrar_coluna(
@@ -601,32 +827,47 @@ if projeto_escolhido:
                     if url_arquivo:
                         anexos.append({"nome": nome_arquivo, "url": url_arquivo})
 
-            status_lower = str(status).strip().lower()
+            # ------------------------------------------------
+            # ANÁLISES JÁ REGISTRADAS NESTE CENÁRIO
+            # ------------------------------------------------
 
-            if status_lower == "aprovado":
-                badge_html = '<span class="status-badge status-aprovado">Aprovado</span>'
-            elif status_lower == "reprovado":
-                badge_html = '<span class="status-badge status-reprovado">Reprovado</span>'
-            else:
-                badge_html = '<span class="status-badge status-pendente">Pronto para análise</span>'
+            analises_do_cenario = []
+            try:
+                filtro_analises = json.dumps({
+                    "property": col_relation,
+                    "relation": {"contains": cenario["id"]}
+                })
+                analises_resp = notion_query(id_analises, filtro_analises)
+                analises_do_cenario = analises_resp.get("results", [])
+            except Exception:
+                analises_do_cenario = []
 
-            with st.expander(f"▸ {nome_cenario}", expanded=True):
+            # ------------------------------------------------
+            # EXPANDER (só o primeiro aberto)
+            # ------------------------------------------------
 
-                # Cabeçalho do cenário
+            with st.expander(
+                f"{emoji_status(status)} {nome_cenario}",
+                expanded=(idx_cenario == 0)
+            ):
+
+                # Badge (sem repetir o título)
                 render_html(
-                    f"""
-                    <div class="scenario-container">
-                        <div class="scenario-header">
-                            <div class="scenario-title">{nome_cenario_html}</div>
-                            {badge_html}
-                        </div>
-                    </div>
-                    """
+                    f'<div class="badge-row">{badge_para(status)}</div>'
                 )
 
                 # Informações
                 responsavel_html = html.escape(str(responsavel))
-                status_html = html.escape(str(status))
+
+                if data_cenario:
+                    segunda_celula = f"""
+                    <div class="info-item">
+                        <div class="info-label">Atualizado em</div>
+                        <div class="info-value">{html.escape(data_cenario)}</div>
+                    </div>
+                    """
+                else:
+                    segunda_celula = ""
 
                 render_html(
                     f"""
@@ -636,10 +877,7 @@ if projeto_escolhido:
                                 <div class="info-label">Responsável</div>
                                 <div class="info-value">{responsavel_html}</div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">Status</div>
-                                <div class="info-value">{status_html}</div>
-                            </div>
+                            {segunda_celula}
                         </div>
                     </div>
                     """
@@ -663,7 +901,6 @@ if projeto_escolhido:
                         nome_arquivo_html = html.escape(arquivo["nome"])
                         conteudo = baixar_arquivo_notion(arquivo["url"])
 
-                        # Sem vertical_alignment (compatível com Streamlit antigo)
                         col_nome, col_btn = st.columns([5, 1])
 
                         with col_nome:
@@ -699,7 +936,73 @@ if projeto_escolhido:
                 else:
                     st.info("Nenhum anexo disponível para este cenário.")
 
+                # --------------------------------------------
+                # ANÁLISES REGISTRADAS (visualização)
+                # --------------------------------------------
+
+                render_html(
+                    f"""
+                    <div class="analyses-section">
+                        <div class="analyses-title">Análises registradas ({len(analises_do_cenario)})</div>
+                    </div>
+                    """
+                )
+
+                if analises_do_cenario:
+
+                    linhas_analises = ""
+
+                    for analise in analises_do_cenario:
+                        a_props = analise.get("properties", {})
+
+                        setor_a = html.escape(
+                            get_status_safe(a_props, colunas_reais.get("setor"))
+                        )
+                        status_a = get_status_safe(
+                            a_props, colunas_reais.get("status")
+                        )
+                        nome_a = html.escape(
+                            get_titulo_safe(a_props, coluna_titulo_analise)
+                        )
+                        motivo_a = html.escape(
+                            get_texto_safe(a_props, colunas_reais.get("motivo"))
+                        )
+                        data_a = html.escape(
+                            get_date_safe(a_props, colunas_reais.get("data"))
+                        )
+
+                        meta_partes = [p for p in [nome_a, data_a] if p]
+                        meta_html = " · ".join(meta_partes)
+
+                        motivo_html = ""
+                        if motivo_a:
+                            motivo_html = (
+                                f'<div class="analysis-motivo">Motivo: {motivo_a}</div>'
+                            )
+
+                        linhas_analises += f"""
+                        <div class="analysis-row">
+                            <div class="analysis-main">
+                                <div class="analysis-setor">{setor_a}</div>
+                                <div class="analysis-meta">{meta_html}</div>
+                                {motivo_html}
+                            </div>
+                            {badge_para(status_a, texto_pendente=status_a)}
+                        </div>
+                        """
+
+                    render_html(linhas_analises)
+
+                else:
+                    render_html(
+                        '<div class="analysis-empty">Nenhuma análise registrada até o momento.</div>'
+                    )
+
                 render_html('<div class="section-divider"></div>')
+
+                # --------------------------------------------
+                # FORMULÁRIO
+                # --------------------------------------------
 
                 render_html(
                     """
@@ -754,6 +1057,7 @@ if projeto_escolhido:
                             st.error("Informe o motivo da reprovação.")
                         else:
                             try:
+                                # Verificação SEM cache (dados frescos)
                                 analises_existentes = notion.databases.query(
                                     database_id=id_analises,
                                     filter={
@@ -821,6 +1125,9 @@ if projeto_escolhido:
                                     st.success(
                                         f"Análise de '{nome_input.strip()}' registrada com sucesso!"
                                     )
+
+                                    # Limpa o cache para mostrar a nova análise já no rerun
+                                    st.cache_data.clear()
                                     st.rerun()
 
                             except Exception as e:
