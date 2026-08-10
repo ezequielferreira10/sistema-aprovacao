@@ -31,10 +31,6 @@ st.set_page_config(
 # ============================================================
 # RENDERIZAÇÃO DE HTML (CORREÇÃO DEFINITIVA)
 # ============================================================
-# 1) dedent remove a indentação comum
-# 2) strip() zera a indentação de CADA linha
-# 3) linhas em branco são removidas
-# Isso impede o Markdown de interpretar o HTML como bloco de código.
 
 def render_html(conteudo):
     conteudo = textwrap.dedent(conteudo)
@@ -255,6 +251,23 @@ render_html(
     div[data-testid="stTextInput"] input,
     div[data-testid="stTextArea"] textarea { border-radius: 8px; }
     .stButton button { border-radius: 8px; font-weight: 700; }
+
+    /* ======================================================
+       ÚNICA ALTERAÇÃO: BOTÃO "SALVAR ANÁLISE" AZUL
+       ====================================================== */
+
+    div.stButton > button[kind="primary"],
+    div.stForm button[kind="primary"] {
+        background: #0f5b9f !important;
+        border-color: #0f5b9f !important;
+        color: #ffffff !important;
+    }
+
+    div.stButton > button[kind="primary"]:hover,
+    div.stForm button[kind="primary"]:hover {
+        background: #0d4f8b !important;
+        border-color: #0d4f8b !important;
+    }
 
     div[data-testid="stExpander"] { background: transparent; border: none; }
     div[data-testid="stExpander"] details { border: none !important; }
@@ -663,7 +676,6 @@ if projeto_escolhido:
                         nome_arquivo_html = html.escape(arquivo["nome"])
                         conteudo = baixar_arquivo_notion(arquivo["url"])
 
-                        # Sem vertical_alignment (compatível com Streamlit antigo)
                         col_nome, col_btn = st.columns([5, 1])
 
                         with col_nome:
