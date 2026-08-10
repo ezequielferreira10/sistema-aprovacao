@@ -5,6 +5,7 @@ import urllib.request
 import ssl
 import os
 import html
+import textwrap
 
 
 # ============================================================
@@ -14,7 +15,7 @@ import html
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 
 if not NOTION_TOKEN:
-    st.error("A variável NOTION_TOKEN não foi configurada.")
+    st.error("A variável NOTION_TOKEN não foi configurada no Railway.")
     st.stop()
 
 notion = Client(auth=NOTION_TOKEN)
@@ -28,10 +29,23 @@ st.set_page_config(
 
 
 # ============================================================
-# CSS - VISUAL DO SISTEMA
+# FUNÇÃO PARA RENDERIZAR HTML
+# ============================================================
+# O textwrap.dedent() remove a indentação do código HTML.
+# Isso evita que o Streamlit mostre as tags <div> na tela.
+
+def render_html(conteudo):
+    st.markdown(
+        textwrap.dedent(conteudo),
+        unsafe_allow_html=True
+    )
+
+
+# ============================================================
+# CSS
 # ============================================================
 
-st.markdown(
+render_html(
     """
     <style>
 
@@ -301,6 +315,10 @@ st.markdown(
         gap: 1rem;
     }
 
+    .info-item {
+        min-width: 0;
+    }
+
     .info-label {
         color: #7a8794;
 
@@ -486,13 +504,12 @@ st.markdown(
     }
 
     </style>
-    """,
-    unsafe_allow_html=True
+    """
 )
 
 
 # ============================================================
-# FUNÇÕES
+# FUNÇÕES DO NOTION
 # ============================================================
 
 def encontrar_tabela(nome_tabela):
@@ -500,7 +517,11 @@ def encontrar_tabela(nome_tabela):
     try:
 
         response = notion.search(
-            query=nome_tabela
+            query=nome_tabela,
+            filter={
+                "property": "object",
+                "value": "data_source"
+            }
         )
 
         resultados = response.get(
@@ -522,13 +543,36 @@ def encontrar_tabela(nome_tabela):
                     ""
                 )
 
-                if (
-                    texto.strip().lower()
-                    ==
-                    nome_tabela.strip().lower()
-                ):
+                if texto.strip().lower() == nome_tabela.strip().lower():
 
                     return resultado["id"]
+
+
+            propriedades = resultado.get(
+                "properties",
+                {}
+            )
+
+            if "title" in propriedades:
+
+                props_title = propriedades[
+                    "title"
+                ].get(
+                    "title",
+                    []
+                )
+
+                if props_title:
+
+                    texto = props_title[0].get(
+                        "plain_text",
+                        ""
+                    )
+
+                    if texto.strip().lower() == nome_tabela.strip().lower():
+
+                        return resultado["id"]
+
 
         return None
 
@@ -550,14 +594,15 @@ def encontrar_coluna_title(props):
 
 def encontrar_coluna(props, nomes_possiveis):
 
-    # Correspondência exata
+    # Primeiro tenta correspondência exata
     for nome in nomes_possiveis:
 
         if nome in props:
 
             return nome
 
-    # Correspondência ignorando maiúsculas/minúsculas
+
+    # Depois ignora maiúsculas/minúsculas
     props_lower = {
         nome.lower(): nome
         for nome in props.keys()
@@ -571,26 +616,25 @@ def encontrar_coluna(props, nomes_possiveis):
                 nome.lower()
             ]
 
+
     return None
 
 
 def get_status_safe(props, coluna_nome):
 
     if not coluna_nome:
-
         return "Não definido"
 
     if coluna_nome not in props:
-
         return "Não definido"
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
-
         return "Não definido"
 
-    # Propriedade SELECT
+
+    # Select
     select = col.get("select")
 
     if isinstance(select, dict):
@@ -600,7 +644,8 @@ def get_status_safe(props, coluna_nome):
             "Não definido"
         )
 
-    # Propriedade STATUS
+
+    # Status
     status = col.get("status")
 
     if isinstance(status, dict):
@@ -610,23 +655,21 @@ def get_status_safe(props, coluna_nome):
             "Não definido"
         )
 
+
     return "Não definido"
 
 
 def get_titulo_safe(props, coluna_nome):
 
     if not coluna_nome:
-
         return "Sem nome"
 
     if coluna_nome not in props:
-
         return "Sem nome"
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
-
         return "Sem nome"
 
     titulos = col.get(
@@ -647,17 +690,14 @@ def get_titulo_safe(props, coluna_nome):
 def get_texto_safe(props, coluna_nome):
 
     if not coluna_nome:
-
         return ""
 
     if coluna_nome not in props:
-
         return ""
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
-
         return ""
 
     textos = col.get(
@@ -678,17 +718,14 @@ def get_texto_safe(props, coluna_nome):
 def get_people_safe(props, coluna_nome):
 
     if not coluna_nome:
-
         return "Não definido"
 
     if coluna_nome not in props:
-
         return "Não definido"
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
-
         return "Não definido"
 
     pessoas = col.get(
@@ -703,19 +740,18 @@ def get_people_safe(props, coluna_nome):
         nome = pessoa.get("name")
 
         if nome:
-
             return nome
 
-        email = pessoa.get(
+        person = pessoa.get(
             "person",
             {}
-        ).get(
-            "email"
         )
 
-        if email:
+        email = person.get("email")
 
+        if email:
             return email
+
 
     return "Não definido"
 
@@ -757,7 +793,6 @@ def get_opcoes_select(
 ):
 
     if not coluna_nome:
-
         return []
 
     propriedades = db_info.get(
@@ -766,14 +801,14 @@ def get_opcoes_select(
     )
 
     if coluna_nome not in propriedades:
-
         return []
 
     prop = propriedades[
         coluna_nome
     ]
 
-    # SELECT
+
+    # Select
     if prop.get("type") == "select":
 
         options = prop.get(
@@ -790,7 +825,8 @@ def get_opcoes_select(
             if opt.get("name")
         ]
 
-    # STATUS
+
+    # Status
     if prop.get("type") == "status":
 
         options = prop.get(
@@ -806,6 +842,7 @@ def get_opcoes_select(
             for opt in options
             if opt.get("name")
         ]
+
 
     return []
 
@@ -823,6 +860,7 @@ def criar_propriedade_opcao(
             }
         }
 
+
     return {
         "select": {
             "name": valor
@@ -831,7 +869,7 @@ def criar_propriedade_opcao(
 
 
 # ============================================================
-# LOCALIZAR TABELAS DO NOTION
+# LOCALIZAR DATABASES
 # ============================================================
 
 id_projetos = encontrar_tabela(
@@ -875,7 +913,7 @@ if not id_analises:
 
 
 # ============================================================
-# INFORMAÇÕES DA TABELA DE ANÁLISES
+# INFORMAÇÕES DA DATABASE DE ANÁLISES
 # ============================================================
 
 try:
@@ -899,28 +937,28 @@ except Exception as e:
 
 with st.sidebar:
 
-    st.markdown(
+    render_html(
         """
         <div class="sidebar-brand">
             Compliance Tributário
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
 
-    st.markdown(
-        '<div class="sidebar-line"></div>',
-        unsafe_allow_html=True
+    render_html(
+        """
+        <div class="sidebar-line"></div>
+        """
     )
 
-    st.markdown(
+    render_html(
         """
         <div class="sidebar-label">
             Projetos
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
+
 
     try:
 
@@ -934,6 +972,7 @@ with st.sidebar:
         )
 
         lista_projetos = []
+
 
         for proj in projetos:
 
@@ -958,6 +997,7 @@ with st.sidebar:
                 }
             )
 
+
         if lista_projetos:
 
             projeto_escolhido = st.selectbox(
@@ -967,13 +1007,14 @@ with st.sidebar:
                 label_visibility="collapsed"
             )
 
+
             if projeto_escolhido:
 
                 nome_sidebar = html.escape(
                     projeto_escolhido["nome"]
                 )
 
-                st.markdown(
+                render_html(
                     f"""
                     <div class="project-selected">
 
@@ -984,9 +1025,9 @@ with st.sidebar:
                         {nome_sidebar}
 
                     </div>
-                    """,
-                    unsafe_allow_html=True
+                    """
                 )
+
 
         else:
 
@@ -995,6 +1036,7 @@ with st.sidebar:
             st.warning(
                 "Nenhum projeto encontrado."
             )
+
 
     except Exception as e:
 
@@ -1020,7 +1062,7 @@ if projeto_escolhido:
     # CABEÇALHO
     # ========================================================
 
-    st.markdown(
+    render_html(
         f"""
         <div class="page-header">
 
@@ -1033,8 +1075,7 @@ if projeto_escolhido:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
 
 
@@ -1059,6 +1100,7 @@ if projeto_escolhido:
             []
         )
 
+
     except Exception as e:
 
         st.error(
@@ -1074,9 +1116,12 @@ if projeto_escolhido:
 
     if not cenarios:
 
-        st.markdown(
-            '<div class="section-label">Cenários</div>',
-            unsafe_allow_html=True
+        render_html(
+            """
+            <div class="section-label">
+                Cenários
+            </div>
+            """
         )
 
         st.info(
@@ -1090,14 +1135,15 @@ if projeto_escolhido:
 
     else:
 
-        # ----------------------------------------------------
-        # PROPRIEDADES DA TABELA ANÁLISES
-        # ----------------------------------------------------
-
         todas_props = db_info_analises.get(
             "properties",
             {}
         )
+
+
+        # ----------------------------------------------------
+        # TÍTULO DA ANÁLISE
+        # ----------------------------------------------------
 
         coluna_titulo_analise = (
             encontrar_coluna_title(
@@ -1107,7 +1153,7 @@ if projeto_escolhido:
 
 
         # ----------------------------------------------------
-        # ENCONTRAR COLUNAS
+        # COLUNAS
         # ----------------------------------------------------
 
         nomes_colunas = {
@@ -1139,6 +1185,7 @@ if projeto_escolhido:
                 "Date",
                 "Data da Análise"
             ]
+
         }
 
 
@@ -1154,7 +1201,7 @@ if projeto_escolhido:
 
 
         # ----------------------------------------------------
-        # TIPO DAS COLUNAS
+        # TIPOS
         # ----------------------------------------------------
 
         tipo_setor = None
@@ -1177,17 +1224,15 @@ if projeto_escolhido:
 
 
         # ----------------------------------------------------
-        # RELAÇÃO ENTRE ANÁLISES E CENÁRIO
+        # RELAÇÃO COM CENÁRIO
         # ----------------------------------------------------
 
         col_relation = None
 
 
-        # Tenta primeiro uma relação com nome relacionado
         for prop_name, prop_info in todas_props.items():
 
             if prop_info.get("type") != "relation":
-
                 continue
 
             nome_lower = prop_name.lower()
@@ -1204,7 +1249,6 @@ if projeto_escolhido:
                 break
 
 
-        # Se não encontrar, pega a primeira relation
         if not col_relation:
 
             for prop_name, prop_info in todas_props.items():
@@ -1226,7 +1270,7 @@ if projeto_escolhido:
 
 
         # ----------------------------------------------------
-        # OPÇÕES DO NOTION
+        # OPÇÕES
         # ----------------------------------------------------
 
         opcoes_setor = get_opcoes_select(
@@ -1239,10 +1283,6 @@ if projeto_escolhido:
             colunas_reais.get("status")
         )
 
-
-        # ----------------------------------------------------
-        # FALLBACK
-        # ----------------------------------------------------
 
         if not opcoes_setor:
 
@@ -1265,17 +1305,20 @@ if projeto_escolhido:
 
 
         # ====================================================
-        # TÍTULO
+        # TÍTULO CENÁRIOS
         # ====================================================
 
-        st.markdown(
-            '<div class="section-label">Cenários</div>',
-            unsafe_allow_html=True
+        render_html(
+            """
+            <div class="section-label">
+                Cenários
+            </div>
+            """
         )
 
 
         # ====================================================
-        # CADA CENÁRIO
+        # LOOP DOS CENÁRIOS
         # ====================================================
 
         for cenario in cenarios:
@@ -1287,7 +1330,7 @@ if projeto_escolhido:
 
 
             # ------------------------------------------------
-            # NOME DO CENÁRIO
+            # NOME
             # ------------------------------------------------
 
             col_titulo_cenario = (
@@ -1406,10 +1449,15 @@ if projeto_escolhido:
 
 
             # ------------------------------------------------
-            # STATUS VISUAL
+            # BADGE
             # ------------------------------------------------
 
-            if status.lower() == "aprovado":
+            status_lower = str(
+                status
+            ).strip().lower()
+
+
+            if status_lower == "aprovado":
 
                 badge_html = """
                 <span class="status-badge status-aprovado">
@@ -1417,13 +1465,15 @@ if projeto_escolhido:
                 </span>
                 """
 
-            elif status.lower() == "reprovado":
+
+            elif status_lower == "reprovado":
 
                 badge_html = """
                 <span class="status-badge status-reprovado">
                     Reprovado
                 </span>
                 """
+
 
             else:
 
@@ -1439,16 +1489,16 @@ if projeto_escolhido:
             # =================================================
 
             with st.expander(
-                f"▸  {nome_cenario}",
+                f"▸ {nome_cenario}",
                 expanded=True
             ):
 
 
                 # =============================================
-                # CABEÇALHO DO CENÁRIO
+                # CABEÇALHO
                 # =============================================
 
-                st.markdown(
+                render_html(
                     f"""
                     <div class="scenario-container">
 
@@ -1463,8 +1513,7 @@ if projeto_escolhido:
                         </div>
 
                     </div>
-                    """,
-                    unsafe_allow_html=True
+                    """
                 )
 
 
@@ -1481,7 +1530,7 @@ if projeto_escolhido:
                 )
 
 
-                st.markdown(
+                render_html(
                     f"""
                     <div class="info-section">
 
@@ -1515,8 +1564,7 @@ if projeto_escolhido:
                         </div>
 
                     </div>
-                    """,
-                    unsafe_allow_html=True
+                    """
                 )
 
 
@@ -1533,7 +1581,7 @@ if projeto_escolhido:
                     )
 
 
-                    st.markdown(
+                    render_html(
                         f"""
                         <div class="files-section">
 
@@ -1547,14 +1595,9 @@ if projeto_escolhido:
                             </div>
 
                         </div>
-                        """,
-                        unsafe_allow_html=True
+                        """
                     )
 
-
-                    # -----------------------------------------
-                    # CADA ARQUIVO
-                    # -----------------------------------------
 
                     for idx, arquivo in enumerate(anexos):
 
@@ -1569,9 +1612,9 @@ if projeto_escolhido:
 
 
                         # IMPORTANTE:
-                        # Não usar vertical_alignment aqui.
-                        # A versão do Streamlit do Railway
-                        # não suporta esse argumento.
+                        # Não usar vertical_alignment.
+                        # Compatível com versões antigas
+                        # do Streamlit.
 
                         col_nome, col_btn = st.columns(
                             [5, 1]
@@ -1580,7 +1623,7 @@ if projeto_escolhido:
 
                         with col_nome:
 
-                            st.markdown(
+                            render_html(
                                 f"""
                                 <div class="file-row">
 
@@ -1589,8 +1632,7 @@ if projeto_escolhido:
                                     </div>
 
                                 </div>
-                                """,
-                                unsafe_allow_html=True
+                                """
                             )
 
 
@@ -1612,6 +1654,7 @@ if projeto_escolhido:
                                     use_container_width=True
                                 )
 
+
                             else:
 
                                 url_segura = html.escape(
@@ -1619,7 +1662,8 @@ if projeto_escolhido:
                                     quote=True
                                 )
 
-                                st.markdown(
+
+                                render_html(
                                     f"""
                                     <a
                                         href="{url_segura}"
@@ -1639,8 +1683,7 @@ if projeto_escolhido:
                                     >
                                         Abrir
                                     </a>
-                                    """,
-                                    unsafe_allow_html=True
+                                    """
                                 )
 
 
@@ -1655,9 +1698,10 @@ if projeto_escolhido:
                 # DIVISOR
                 # =============================================
 
-                st.markdown(
-                    '<div class="section-divider"></div>',
-                    unsafe_allow_html=True
+                render_html(
+                    """
+                    <div class="section-divider"></div>
+                    """
                 )
 
 
@@ -1665,7 +1709,7 @@ if projeto_escolhido:
                 # FORMULÁRIO
                 # =============================================
 
-                st.markdown(
+                render_html(
                     """
                     <div class="form-section">
 
@@ -1680,19 +1724,18 @@ if projeto_escolhido:
                         </div>
 
                     </div>
-                    """,
-                    unsafe_allow_html=True
+                    """
                 )
 
+
+                # =============================================
+                # FORM
+                # =============================================
 
                 with st.form(
                     key=f"form_analise_{cenario['id']}"
                 ):
 
-
-                    # -----------------------------------------
-                    # CAMPOS
-                    # -----------------------------------------
 
                     col_f1, col_f2 = st.columns(
                         2
@@ -1745,10 +1788,6 @@ if projeto_escolhido:
                         )
 
 
-                    # -----------------------------------------
-                    # BOTÃO
-                    # -----------------------------------------
-
                     submit = st.form_submit_button(
                         "Salvar análise",
                         type="primary",
@@ -1757,14 +1796,14 @@ if projeto_escolhido:
 
 
                     # ==========================================
-                    # PROCESSAR
+                    # PROCESSAMENTO
                     # ==========================================
 
                     if submit:
 
 
                         # --------------------------------------
-                        # VALIDAÇÃO DO NOME
+                        # NOME
                         # --------------------------------------
 
                         if not nome_input.strip():
@@ -1775,7 +1814,7 @@ if projeto_escolhido:
 
 
                         # --------------------------------------
-                        # VALIDAÇÃO DO SETOR
+                        # SETOR
                         # --------------------------------------
 
                         elif not setor_input:
@@ -1786,7 +1825,7 @@ if projeto_escolhido:
 
 
                         # --------------------------------------
-                        # VALIDAÇÃO DO STATUS
+                        # STATUS
                         # --------------------------------------
 
                         elif not status_input:
@@ -1797,11 +1836,11 @@ if projeto_escolhido:
 
 
                         # --------------------------------------
-                        # VALIDAÇÃO DA REPROVAÇÃO
+                        # MOTIVO
                         # --------------------------------------
 
                         elif (
-                            status_input.lower()
+                            status_input.strip().lower()
                             == "reprovado"
                             and
                             not motivo_input.strip()
@@ -1813,16 +1852,16 @@ if projeto_escolhido:
 
 
                         # --------------------------------------
-                        # TUDO OK
+                        # SALVAR
                         # --------------------------------------
 
                         else:
 
                             try:
 
-                                # ==============================
-                                # VERIFICAR ANÁLISES EXISTENTES
-                                # ==============================
+                                # =================================
+                                # VERIFICAR DUPLICIDADE
+                                # =================================
 
                                 analises_existentes = (
                                     notion.databases.query(
@@ -1870,18 +1909,15 @@ if projeto_escolhido:
 
 
                                     if (
-                                        setor_existente
-                                        == setor_input
+                                        setor_existente.strip().lower()
+                                        ==
+                                        setor_input.strip().lower()
                                     ):
 
                                         setor_ja_analisou = True
 
                                         break
 
-
-                                # ==============================
-                                # BLOQUEAR DUPLICIDADE
-                                # ==============================
 
                                 if setor_ja_analisou:
 
@@ -1893,11 +1929,11 @@ if projeto_escolhido:
                                     )
 
 
-                                # ==============================
-                                # CRIAR ANÁLISE
-                                # ==============================
-
                                 else:
+
+                                    # =================================
+                                    # DATA
+                                    # =================================
 
                                     data_hoje = (
                                         datetime.now()
@@ -1910,9 +1946,9 @@ if projeto_escolhido:
                                     propriedades = {}
 
 
-                                    # --------------------------
-                                    # NOME DO ANALISTA
-                                    # --------------------------
+                                    # =================================
+                                    # TÍTULO
+                                    # =================================
 
                                     if coluna_titulo_analise:
 
@@ -1938,9 +1974,9 @@ if projeto_escolhido:
                                         }
 
 
-                                    # --------------------------
+                                    # =================================
                                     # SETOR
-                                    # --------------------------
+                                    # =================================
 
                                     if colunas_reais.get(
                                         "setor"
@@ -1956,9 +1992,9 @@ if projeto_escolhido:
                                         )
 
 
-                                    # --------------------------
+                                    # =================================
                                     # STATUS
-                                    # --------------------------
+                                    # =================================
 
                                     if colunas_reais.get(
                                         "status"
@@ -1974,9 +2010,9 @@ if projeto_escolhido:
                                         )
 
 
-                                    # --------------------------
+                                    # =================================
                                     # MOTIVO
-                                    # --------------------------
+                                    # =================================
 
                                     if colunas_reais.get(
                                         "motivo"
@@ -2016,9 +2052,9 @@ if projeto_escolhido:
                                             }
 
 
-                                    # --------------------------
+                                    # =================================
                                     # DATA
-                                    # --------------------------
+                                    # =================================
 
                                     if colunas_reais.get(
                                         "data"
@@ -2038,9 +2074,9 @@ if projeto_escolhido:
                                         }
 
 
-                                    # --------------------------
+                                    # =================================
                                     # RELAÇÃO COM CENÁRIO
-                                    # --------------------------
+                                    # =================================
 
                                     propriedades[
                                         col_relation
@@ -2060,9 +2096,9 @@ if projeto_escolhido:
                                     }
 
 
-                                    # ==========================
-                                    # SALVAR NO NOTION
-                                    # ==========================
+                                    # =================================
+                                    # CRIAR PÁGINA NO NOTION
+                                    # =================================
 
                                     notion.pages.create(
 
@@ -2078,9 +2114,9 @@ if projeto_escolhido:
                                     )
 
 
-                                    # ==========================
+                                    # =================================
                                     # SUCESSO
-                                    # ==========================
+                                    # =================================
 
                                     st.success(
                                         f"Análise de "
@@ -2095,8 +2131,7 @@ if projeto_escolhido:
                             except Exception as e:
 
                                 st.error(
-                                    "Não foi possível salvar "
-                                    "a análise."
+                                    "Não foi possível salvar a análise."
                                 )
 
                                 st.caption(
@@ -2105,12 +2140,12 @@ if projeto_escolhido:
 
 
 # ============================================================
-# CASO NÃO TENHA PROJETO
+# SEM PROJETO
 # ============================================================
 
 else:
 
-    st.markdown(
+    render_html(
         """
         <div class="page-header">
 
@@ -2123,6 +2158,5 @@ else:
             </div>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
