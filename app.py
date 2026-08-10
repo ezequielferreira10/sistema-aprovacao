@@ -285,6 +285,17 @@ render_html(
         .scenario-header { flex-direction: column; align-items: flex-start; }
     }
 
+    button[kind="primary"] {
+        background: #0f5b9f !important;
+        border-color: #0f5b9f !important;
+        color: #ffffff !important;
+    }
+
+    button[kind="primary"]:hover {
+        background: #0d4f8b !important;
+        border-color: #0d4f8b !important;
+    }
+
     </style>
     """
 )
