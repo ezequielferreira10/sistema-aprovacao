@@ -14,7 +14,7 @@ import html
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 
 if not NOTION_TOKEN:
-    st.error("A variável NOTION_TOKEN não foi configurada no ambiente.")
+    st.error("A variável NOTION_TOKEN não foi configurada.")
     st.stop()
 
 notion = Client(auth=NOTION_TOKEN)
@@ -28,15 +28,16 @@ st.set_page_config(
 
 
 # ============================================================
-# CSS
+# CSS - VISUAL DO SISTEMA
 # ============================================================
 
-st.markdown("""
-<style>
+st.markdown(
+    """
+    <style>
 
-    /* ========================================================
-       GERAL
-       ======================================================== */
+    /* ======================================================
+       CONFIGURAÇÃO GERAL
+       ====================================================== */
 
     .stApp {
         background-color: #f4f7fb;
@@ -48,7 +49,6 @@ st.markdown("""
         padding-bottom: 3rem;
     }
 
-    /* Remove alguns elementos padrão do Streamlit */
     #MainMenu {
         visibility: hidden;
     }
@@ -62,16 +62,17 @@ st.markdown("""
     }
 
 
-    /* ========================================================
+    /* ======================================================
        SIDEBAR
-       ======================================================== */
+       ====================================================== */
 
     section[data-testid="stSidebar"] {
         background: linear-gradient(
             180deg,
             #0f5b9f 0%,
-            #115a99 100%
+            #125d9f 100%
         );
+
         border-right: none;
     }
 
@@ -87,21 +88,21 @@ st.markdown("""
         font-size: 1.25rem;
         font-weight: 700;
         letter-spacing: -0.3px;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.4rem;
     }
 
     .sidebar-line {
         height: 1px;
         background: rgba(255,255,255,0.22);
-        margin: 0.5rem 0 1.8rem 0;
+        margin: 0.5rem 0 1.7rem 0;
     }
 
     .sidebar-label {
-        font-size: 0.76rem;
-        font-weight: 700;
+        font-size: 0.72rem;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        opacity: 0.8;
+        letter-spacing: 1.2px;
+        opacity: 0.82;
         margin-bottom: 0.55rem;
     }
 
@@ -109,20 +110,20 @@ st.markdown("""
         background: rgba(255,255,255,0.10);
         border: 1px solid rgba(255,255,255,0.12);
         border-radius: 10px;
-        padding: 0.8rem 0.9rem;
-        margin-top: 0.8rem;
-        font-size: 0.92rem;
+        padding: 0.75rem 0.85rem;
+        margin-top: 0.75rem;
+        font-size: 0.91rem;
         font-weight: 600;
     }
 
     .project-icon {
-        margin-right: 0.45rem;
+        margin-right: 0.4rem;
     }
 
 
-    /* ========================================================
-       CABEÇALHO PRINCIPAL
-       ======================================================== */
+    /* ======================================================
+       CABEÇALHO
+       ====================================================== */
 
     .page-header {
         background: linear-gradient(
@@ -132,7 +133,9 @@ st.markdown("""
         );
 
         border-radius: 18px;
-        padding: 2.5rem 2rem;
+
+        padding: 2.4rem 2rem;
+
         margin-bottom: 2rem;
 
         box-shadow:
@@ -141,45 +144,63 @@ st.markdown("""
 
     .page-title {
         color: white;
+
         font-size: 2.35rem;
+
         font-weight: 750;
+
         text-align: center;
+
         margin: 0;
+
         letter-spacing: -1px;
     }
 
     .page-subtitle {
         color: rgba(255,255,255,0.88);
+
         font-size: 1rem;
+
         text-align: center;
+
         margin-top: 0.55rem;
     }
 
 
-    /* ========================================================
-       SEÇÕES
-       ======================================================== */
+    /* ======================================================
+       TÍTULOS DE SEÇÃO
+       ====================================================== */
 
     .section-label {
         color: #5c6b7a;
+
         font-size: 0.72rem;
+
         font-weight: 800;
+
         text-transform: uppercase;
+
         letter-spacing: 1.4px;
+
         margin-top: 1.3rem;
+
         margin-bottom: 0.65rem;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        CENÁRIO
-       ======================================================== */
+       ====================================================== */
 
     .scenario-container {
         background: white;
-        border: 1px solid #e4e9ef;
+
+        border: 1px solid #e3e8ee;
+
         border-radius: 14px;
+
         padding: 1.25rem 1.35rem;
+
         margin-bottom: 1rem;
 
         box-shadow:
@@ -188,34 +209,46 @@ st.markdown("""
 
     .scenario-header {
         display: flex;
+
         align-items: center;
+
         justify-content: space-between;
+
         gap: 1rem;
     }
 
     .scenario-title {
         color: #075da8;
+
         font-size: 1.35rem;
+
         font-weight: 750;
+
         letter-spacing: -0.25px;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        STATUS
-       ======================================================== */
+       ====================================================== */
 
     .status-badge {
         display: inline-flex;
+
         align-items: center;
+
         justify-content: center;
 
         border-radius: 999px;
+
         padding: 0.45rem 0.85rem;
 
-        font-size: 0.72rem;
+        font-size: 0.70rem;
+
         font-weight: 800;
+
         text-transform: uppercase;
+
         letter-spacing: 0.3px;
 
         white-space: nowrap;
@@ -223,107 +256,138 @@ st.markdown("""
 
     .status-pendente {
         color: #075da8;
+
         background: #edf5fc;
+
         border: 1px solid #b9d7ef;
     }
 
     .status-aprovado {
         color: #247043;
+
         background: #edf8f1;
+
         border: 1px solid #b9dec5;
     }
 
     .status-reprovado {
         color: #a33a3a;
+
         background: #fff0f0;
+
         border: 1px solid #e8bcbc;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        INFORMAÇÕES
-       ======================================================== */
+       ====================================================== */
 
     .info-section {
         background: #f8fafc;
+
         border-radius: 10px;
+
         padding: 1rem 1.1rem;
+
         margin-top: 0.8rem;
     }
 
     .info-grid {
         display: grid;
+
         grid-template-columns: 1fr 1fr;
+
         gap: 1rem;
     }
 
     .info-label {
         color: #7a8794;
-        font-size: 0.7rem;
+
+        font-size: 0.70rem;
+
         font-weight: 800;
+
         text-transform: uppercase;
+
         letter-spacing: 0.7px;
+
         margin-bottom: 0.25rem;
     }
 
     .info-value {
         color: #243447;
+
         font-size: 0.93rem;
+
         font-weight: 600;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        ANEXOS
-       ======================================================== */
+       ====================================================== */
 
     .files-section {
         margin-top: 1.3rem;
+
         margin-bottom: 0.7rem;
     }
 
     .files-label {
         color: #26384a;
+
         font-size: 0.9rem;
+
         font-weight: 750;
+
         margin-bottom: 0.15rem;
     }
 
     .files-message {
         color: #7a8794;
+
         font-size: 0.8rem;
     }
 
     .file-row {
         display: flex;
+
         align-items: center;
-        justify-content: space-between;
 
         background: white;
+
         border: 1px solid #e3e8ee;
+
         border-radius: 9px;
 
         padding: 0.7rem 0.85rem;
+
         margin-top: 0.45rem;
     }
 
     .file-name {
         color: #314254;
+
         font-size: 0.87rem;
+
         font-weight: 600;
 
         overflow: hidden;
+
         text-overflow: ellipsis;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        FORMULÁRIO
-       ======================================================== */
+       ====================================================== */
 
     .section-divider {
         height: 1px;
+
         background: #e5e9ee;
+
         margin: 1.5rem 0;
     }
 
@@ -333,21 +397,26 @@ st.markdown("""
 
     .form-title {
         color: #25384a;
+
         font-size: 1.15rem;
+
         font-weight: 750;
+
         margin: 0 0 0.25rem 0;
     }
 
     .form-message {
         color: #748292;
+
         font-size: 0.82rem;
+
         margin: 0;
     }
 
 
-    /* ========================================================
-       INPUTS STREAMLIT
-       ======================================================== */
+    /* ======================================================
+       INPUTS
+       ====================================================== */
 
     div[data-baseweb="select"] > div {
         border-radius: 8px;
@@ -358,19 +427,20 @@ st.markdown("""
         border-radius: 8px;
     }
 
-    .stButton button,
-    button[data-testid="stFormSubmitButton"] {
+    .stButton button {
         border-radius: 8px;
+
         font-weight: 700;
     }
 
 
-    /* ========================================================
+    /* ======================================================
        EXPANDER
-       ======================================================== */
+       ====================================================== */
 
     div[data-testid="stExpander"] {
         background: transparent;
+
         border: none;
     }
 
@@ -380,8 +450,11 @@ st.markdown("""
 
     div[data-testid="stExpander"] summary {
         background: white;
+
         border: 1px solid #dfe5eb;
+
         border-radius: 12px;
+
         padding: 0.9rem 1rem;
     }
 
@@ -390,9 +463,9 @@ st.markdown("""
     }
 
 
-    /* ========================================================
+    /* ======================================================
        RESPONSIVIDADE
-       ======================================================== */
+       ====================================================== */
 
     @media (max-width: 800px) {
 
@@ -406,86 +479,85 @@ st.markdown("""
 
         .scenario-header {
             flex-direction: column;
+
             align-items: flex-start;
         }
 
     }
 
-</style>
-""", unsafe_allow_html=True)
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 
 # ============================================================
-# FUNÇÕES AUXILIARES
+# FUNÇÕES
 # ============================================================
 
 def encontrar_tabela(nome_tabela):
-    """
-    Localiza uma database/data source do Notion pelo nome.
-    """
 
     try:
+
         response = notion.search(
             query=nome_tabela
         )
 
-        resultados = response.get("results", [])
+        resultados = response.get(
+            "results",
+            []
+        )
 
         for resultado in resultados:
 
-            # Database antiga
-            if resultado.get("object") == "database":
+            titulo = resultado.get(
+                "title",
+                []
+            )
 
-                titulo = resultado.get("title", [])
+            if titulo:
 
-                if titulo:
-                    texto = titulo[0].get("plain_text", "")
+                texto = titulo[0].get(
+                    "plain_text",
+                    ""
+                )
 
-                    if texto.strip().lower() == nome_tabela.strip().lower():
-                        return resultado["id"]
+                if (
+                    texto.strip().lower()
+                    ==
+                    nome_tabela.strip().lower()
+                ):
 
-            # Data source
-            if resultado.get("object") == "data_source":
-
-                titulo = resultado.get("title", [])
-
-                if titulo:
-                    texto = titulo[0].get("plain_text", "")
-
-                    if texto.strip().lower() == nome_tabela.strip().lower():
-                        return resultado["id"]
+                    return resultado["id"]
 
         return None
 
     except Exception:
+
         return None
 
 
 def encontrar_coluna_title(props):
-    """
-    Encontra automaticamente a propriedade do tipo title.
-    """
 
     for prop_name, prop_info in props.items():
 
         if prop_info.get("type") == "title":
+
             return prop_name
 
     return None
 
 
 def encontrar_coluna(props, nomes_possiveis):
-    """
-    Procura uma propriedade utilizando possíveis nomes.
-    """
 
-    # Primeiro procura correspondência exata
+    # Correspondência exata
     for nome in nomes_possiveis:
 
         if nome in props:
+
             return nome
 
-    # Depois procura ignorando maiúsculas/minúsculas
+    # Correspondência ignorando maiúsculas/minúsculas
     props_lower = {
         nome.lower(): nome
         for nome in props.keys()
@@ -494,42 +566,49 @@ def encontrar_coluna(props, nomes_possiveis):
     for nome in nomes_possiveis:
 
         if nome.lower() in props_lower:
-            return props_lower[nome.lower()]
+
+            return props_lower[
+                nome.lower()
+            ]
 
     return None
 
 
-def get_select_safe(props, coluna_nome):
-    """
-    Retorna valor de propriedades do tipo select ou status.
-    """
+def get_status_safe(props, coluna_nome):
 
     if not coluna_nome:
+
         return "Não definido"
 
     if coluna_nome not in props:
+
         return "Não definido"
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
+
         return "Não definido"
 
-    # Select
-    if col.get("select"):
+    # Propriedade SELECT
+    select = col.get("select")
 
-        select = col.get("select")
+    if isinstance(select, dict):
 
-        if isinstance(select, dict):
-            return select.get("name", "Não definido")
+        return select.get(
+            "name",
+            "Não definido"
+        )
 
-    # Status
-    if col.get("status"):
+    # Propriedade STATUS
+    status = col.get("status")
 
-        status = col.get("status")
+    if isinstance(status, dict):
 
-        if isinstance(status, dict):
-            return status.get("name", "Não definido")
+        return status.get(
+            "name",
+            "Não definido"
+        )
 
     return "Não definido"
 
@@ -537,17 +616,23 @@ def get_select_safe(props, coluna_nome):
 def get_titulo_safe(props, coluna_nome):
 
     if not coluna_nome:
+
         return "Sem nome"
 
     if coluna_nome not in props:
+
         return "Sem nome"
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
+
         return "Sem nome"
 
-    titulos = col.get("title", [])
+    titulos = col.get(
+        "title",
+        []
+    )
 
     if titulos:
 
@@ -562,17 +647,23 @@ def get_titulo_safe(props, coluna_nome):
 def get_texto_safe(props, coluna_nome):
 
     if not coluna_nome:
+
         return ""
 
     if coluna_nome not in props:
+
         return ""
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
+
         return ""
 
-    textos = col.get("rich_text", [])
+    textos = col.get(
+        "rich_text",
+        []
+    )
 
     if textos:
 
@@ -587,27 +678,44 @@ def get_texto_safe(props, coluna_nome):
 def get_people_safe(props, coluna_nome):
 
     if not coluna_nome:
+
         return "Não definido"
 
     if coluna_nome not in props:
+
         return "Não definido"
 
     col = props[coluna_nome]
 
     if not isinstance(col, dict):
+
         return "Não definido"
 
-    pessoas = col.get("people", [])
+    pessoas = col.get(
+        "people",
+        []
+    )
 
     if pessoas:
 
         pessoa = pessoas[0]
 
-        return (
-            pessoa.get("name")
-            or pessoa.get("person", {}).get("email")
-            or "Não definido"
+        nome = pessoa.get("name")
+
+        if nome:
+
+            return nome
+
+        email = pessoa.get(
+            "person",
+            {}
+        ).get(
+            "email"
         )
+
+        if email:
+
+            return email
 
     return "Não definido"
 
@@ -619,6 +727,7 @@ def baixar_arquivo_notion(url):
         ctx = ssl.create_default_context()
 
         ctx.check_hostname = False
+
         ctx.verify_mode = ssl.CERT_NONE
 
         req = urllib.request.Request(
@@ -642,9 +751,13 @@ def baixar_arquivo_notion(url):
         return None
 
 
-def get_opcoes_select(db_info, coluna_nome):
+def get_opcoes_select(
+    db_info,
+    coluna_nome
+):
 
     if not coluna_nome:
+
         return []
 
     propriedades = db_info.get(
@@ -653,9 +766,12 @@ def get_opcoes_select(db_info, coluna_nome):
     )
 
     if coluna_nome not in propriedades:
+
         return []
 
-    prop = propriedades[coluna_nome]
+    prop = propriedades[
+        coluna_nome
+    ]
 
     # SELECT
     if prop.get("type") == "select":
@@ -694,11 +810,10 @@ def get_opcoes_select(db_info, coluna_nome):
     return []
 
 
-def criar_propriedade_select(tipo, valor):
-
-    """
-    Cria propriedade compatível com Select ou Status.
-    """
+def criar_propriedade_opcao(
+    tipo,
+    valor
+):
 
     if tipo == "status":
 
@@ -716,34 +831,51 @@ def criar_propriedade_select(tipo, valor):
 
 
 # ============================================================
-# LOCALIZAR BASES DO NOTION
+# LOCALIZAR TABELAS DO NOTION
 # ============================================================
 
-id_projetos = encontrar_tabela("Projetos")
-id_cenarios = encontrar_tabela("Cenário")
-id_analises = encontrar_tabela("Análises")
+id_projetos = encontrar_tabela(
+    "Projetos"
+)
+
+id_cenarios = encontrar_tabela(
+    "Cenário"
+)
+
+id_analises = encontrar_tabela(
+    "Análises"
+)
+
 
 if not id_projetos:
+
     st.error(
-        "Não foi possível encontrar a tabela 'Projetos' no Notion."
+        "Tabela 'Projetos' não encontrada no Notion."
     )
+
     st.stop()
+
 
 if not id_cenarios:
+
     st.error(
-        "Não foi possível encontrar a tabela 'Cenário' no Notion."
+        "Tabela 'Cenário' não encontrada no Notion."
     )
+
     st.stop()
 
+
 if not id_analises:
+
     st.error(
-        "Não foi possível encontrar a tabela 'Análises' no Notion."
+        "Tabela 'Análises' não encontrada no Notion."
     )
+
     st.stop()
 
 
 # ============================================================
-# INFORMAÇÕES DA BASE DE ANÁLISES
+# INFORMAÇÕES DA TABELA DE ANÁLISES
 # ============================================================
 
 try:
@@ -768,7 +900,11 @@ except Exception as e:
 with st.sidebar:
 
     st.markdown(
-        '<div class="sidebar-brand">Compliance Tributário</div>',
+        """
+        <div class="sidebar-brand">
+            Compliance Tributário
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
@@ -778,7 +914,11 @@ with st.sidebar:
     )
 
     st.markdown(
-        '<div class="sidebar-label">Projetos</div>',
+        """
+        <div class="sidebar-label">
+            Projetos
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
@@ -829,15 +969,20 @@ with st.sidebar:
 
             if projeto_escolhido:
 
-                nome_projeto_sidebar = html.escape(
+                nome_sidebar = html.escape(
                     projeto_escolhido["nome"]
                 )
 
                 st.markdown(
                     f"""
                     <div class="project-selected">
-                        <span class="project-icon">✓</span>
-                        {nome_projeto_sidebar}
+
+                        <span class="project-icon">
+                            ✓
+                        </span>
+
+                        {nome_sidebar}
+
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -847,8 +992,8 @@ with st.sidebar:
 
             projeto_escolhido = None
 
-            st.info(
-                "Nenhum projeto disponível."
+            st.warning(
+                "Nenhum projeto encontrado."
             )
 
     except Exception as e:
@@ -861,7 +1006,7 @@ with st.sidebar:
 
 
 # ============================================================
-# CONTEÚDO PRINCIPAL
+# TELA PRINCIPAL
 # ============================================================
 
 if projeto_escolhido:
@@ -870,9 +1015,10 @@ if projeto_escolhido:
         projeto_escolhido["nome"]
     )
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # CABEÇALHO
-    # --------------------------------------------------------
+    # ========================================================
 
     st.markdown(
         f"""
@@ -892,9 +1038,9 @@ if projeto_escolhido:
     )
 
 
-    # --------------------------------------------------------
-    # BUSCAR CENÁRIOS DO PROJETO
-    # --------------------------------------------------------
+    # ========================================================
+    # BUSCAR CENÁRIOS
+    # ========================================================
 
     try:
 
@@ -922,9 +1068,9 @@ if projeto_escolhido:
         st.stop()
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # NENHUM CENÁRIO
-    # --------------------------------------------------------
+    # ========================================================
 
     if not cenarios:
 
@@ -934,13 +1080,18 @@ if projeto_escolhido:
         )
 
         st.info(
-            "Nenhum cenário cadastrado para este projeto."
+            "Nenhum cenário encontrado para este projeto."
         )
+
+
+    # ========================================================
+    # EXISTEM CENÁRIOS
+    # ========================================================
 
     else:
 
         # ----------------------------------------------------
-        # CONFIGURAÇÃO DAS COLUNAS DE ANÁLISE
+        # PROPRIEDADES DA TABELA ANÁLISES
         # ----------------------------------------------------
 
         todas_props = db_info_analises.get(
@@ -948,9 +1099,16 @@ if projeto_escolhido:
             {}
         )
 
-        coluna_titulo_analise = encontrar_coluna_title(
-            todas_props
+        coluna_titulo_analise = (
+            encontrar_coluna_title(
+                todas_props
+            )
         )
+
+
+        # ----------------------------------------------------
+        # ENCONTRAR COLUNAS
+        # ----------------------------------------------------
 
         nomes_colunas = {
 
@@ -983,7 +1141,9 @@ if projeto_escolhido:
             ]
         }
 
+
         colunas_reais = {}
+
 
         for chave, possiveis in nomes_colunas.items():
 
@@ -994,17 +1154,20 @@ if projeto_escolhido:
 
 
         # ----------------------------------------------------
-        # TIPOS DAS PROPRIEDADES
+        # TIPO DAS COLUNAS
         # ----------------------------------------------------
 
         tipo_setor = None
+
         tipo_status = None
+
 
         if colunas_reais.get("setor"):
 
             tipo_setor = todas_props[
                 colunas_reais["setor"]
             ].get("type")
+
 
         if colunas_reais.get("status"):
 
@@ -1014,51 +1177,56 @@ if projeto_escolhido:
 
 
         # ----------------------------------------------------
-        # ENCONTRAR RELAÇÃO COM CENÁRIO
+        # RELAÇÃO ENTRE ANÁLISES E CENÁRIO
         # ----------------------------------------------------
 
         col_relation = None
 
-        # Primeiro tenta encontrar pelo nome
-        for nome_prop, prop_info in todas_props.items():
 
-            if (
-                prop_info.get("type") == "relation"
-                and nome_prop.lower()
-                in [
-                    "cenário",
-                    "cenario",
-                    "cenários",
-                    "cenarios"
-                ]
-            ):
+        # Tenta primeiro uma relação com nome relacionado
+        for prop_name, prop_info in todas_props.items():
 
-                col_relation = nome_prop
+            if prop_info.get("type") != "relation":
+
+                continue
+
+            nome_lower = prop_name.lower()
+
+            if nome_lower in [
+                "cenário",
+                "cenario",
+                "cenários",
+                "cenarios"
+            ]:
+
+                col_relation = prop_name
+
                 break
 
 
-        # Se não encontrar, procura qualquer relação
+        # Se não encontrar, pega a primeira relation
         if not col_relation:
 
-            for nome_prop, prop_info in todas_props.items():
+            for prop_name, prop_info in todas_props.items():
 
                 if prop_info.get("type") == "relation":
 
-                    col_relation = nome_prop
+                    col_relation = prop_name
+
                     break
 
 
         if not col_relation:
 
             st.error(
-                "Não foi encontrada a relação entre Análises e Cenário no Notion."
+                "A tabela 'Análises' não possui uma relação com os cenários."
             )
 
             st.stop()
 
 
         # ----------------------------------------------------
-        # OPÇÕES
+        # OPÇÕES DO NOTION
         # ----------------------------------------------------
 
         opcoes_setor = get_opcoes_select(
@@ -1072,7 +1240,10 @@ if projeto_escolhido:
         )
 
 
-        # Fallback somente caso o Notion não tenha opções
+        # ----------------------------------------------------
+        # FALLBACK
+        # ----------------------------------------------------
+
         if not opcoes_setor:
 
             opcoes_setor = [
@@ -1093,9 +1264,9 @@ if projeto_escolhido:
             ]
 
 
-        # ----------------------------------------------------
-        # TÍTULO DA SEÇÃO
-        # ----------------------------------------------------
+        # ====================================================
+        # TÍTULO
+        # ====================================================
 
         st.markdown(
             '<div class="section-label">Cenários</div>',
@@ -1104,7 +1275,7 @@ if projeto_escolhido:
 
 
         # ====================================================
-        # LOOP DOS CENÁRIOS
+        # CADA CENÁRIO
         # ====================================================
 
         for cenario in cenarios:
@@ -1114,12 +1285,15 @@ if projeto_escolhido:
                 {}
             )
 
+
             # ------------------------------------------------
-            # DADOS DO CENÁRIO
+            # NOME DO CENÁRIO
             # ------------------------------------------------
 
-            col_titulo_cenario = encontrar_coluna_title(
-                props
+            col_titulo_cenario = (
+                encontrar_coluna_title(
+                    props
+                )
             )
 
             nome_cenario = get_titulo_safe(
@@ -1136,26 +1310,19 @@ if projeto_escolhido:
             # STATUS DO CENÁRIO
             # ------------------------------------------------
 
-            status = get_select_safe(
+            coluna_status_cenario = encontrar_coluna(
                 props,
-                "Status"
+                [
+                    "Status",
+                    "Situação",
+                    "Situacao"
+                ]
             )
 
-            if status == "Não definido":
-
-                coluna_status_cenario = encontrar_coluna(
-                    props,
-                    [
-                        "Status",
-                        "Situação",
-                        "Situacao"
-                    ]
-                )
-
-                status = get_select_safe(
-                    props,
-                    coluna_status_cenario
-                )
+            status = get_status_safe(
+                props,
+                coluna_status_cenario
+            )
 
 
             # ------------------------------------------------
@@ -1182,6 +1349,7 @@ if projeto_escolhido:
 
             anexos = []
 
+
             coluna_anexos = encontrar_coluna(
                 props,
                 [
@@ -1192,6 +1360,7 @@ if projeto_escolhido:
                 ]
             )
 
+
             if coluna_anexos:
 
                 arquivos = props[
@@ -1200,6 +1369,7 @@ if projeto_escolhido:
                     "files",
                     []
                 )
+
 
                 for arquivo in arquivos:
 
@@ -1210,17 +1380,20 @@ if projeto_escolhido:
 
                     url_arquivo = None
 
+
                     if arquivo.get("external"):
 
                         url_arquivo = arquivo[
                             "external"
                         ].get("url")
 
+
                     elif arquivo.get("file"):
 
                         url_arquivo = arquivo[
                             "file"
                         ].get("url")
+
 
                     if url_arquivo:
 
@@ -1233,10 +1406,10 @@ if projeto_escolhido:
 
 
             # ------------------------------------------------
-            # BADGE DE STATUS
+            # STATUS VISUAL
             # ------------------------------------------------
 
-            if status == "Aprovado":
+            if status.lower() == "aprovado":
 
                 badge_html = """
                 <span class="status-badge status-aprovado">
@@ -1244,7 +1417,7 @@ if projeto_escolhido:
                 </span>
                 """
 
-            elif status == "Reprovado":
+            elif status.lower() == "reprovado":
 
                 badge_html = """
                 <span class="status-badge status-reprovado">
@@ -1270,9 +1443,10 @@ if projeto_escolhido:
                 expanded=True
             ):
 
-                # ---------------------------------------------
+
+                # =============================================
                 # CABEÇALHO DO CENÁRIO
-                # ---------------------------------------------
+                # =============================================
 
                 st.markdown(
                     f"""
@@ -1294,9 +1468,9 @@ if projeto_escolhido:
                 )
 
 
-                # ---------------------------------------------
+                # =============================================
                 # INFORMAÇÕES
-                # ---------------------------------------------
+                # =============================================
 
                 responsavel_html = html.escape(
                     str(responsavel)
@@ -1305,6 +1479,7 @@ if projeto_escolhido:
                 status_html = html.escape(
                     str(status)
                 )
+
 
                 st.markdown(
                     f"""
@@ -1345,9 +1520,9 @@ if projeto_escolhido:
                 )
 
 
-                # ---------------------------------------------
+                # =============================================
                 # ANEXOS
-                # ---------------------------------------------
+                # =============================================
 
                 if anexos:
 
@@ -1356,6 +1531,7 @@ if projeto_escolhido:
                         if len(anexos) == 1
                         else "Anexos"
                     )
+
 
                     st.markdown(
                         f"""
@@ -1376,19 +1552,29 @@ if projeto_escolhido:
                     )
 
 
+                    # -----------------------------------------
+                    # CADA ARQUIVO
+                    # -----------------------------------------
+
                     for idx, arquivo in enumerate(anexos):
 
-                        nome_arquivo = html.escape(
+                        nome_arquivo_html = html.escape(
                             arquivo["nome"]
                         )
+
 
                         conteudo = baixar_arquivo_notion(
                             arquivo["url"]
                         )
 
+
+                        # IMPORTANTE:
+                        # Não usar vertical_alignment aqui.
+                        # A versão do Streamlit do Railway
+                        # não suporta esse argumento.
+
                         col_nome, col_btn = st.columns(
-                            [5, 1],
-                            vertical_alignment="center"
+                            [5, 1]
                         )
 
 
@@ -1399,7 +1585,7 @@ if projeto_escolhido:
                                 <div class="file-row">
 
                                     <div class="file-name">
-                                        📄 {nome_arquivo}
+                                        📄 {nome_arquivo_html}
                                     </div>
 
                                 </div>
@@ -1428,10 +1614,33 @@ if projeto_escolhido:
 
                             else:
 
-                                st.link_button(
-                                    "Abrir",
+                                url_segura = html.escape(
                                     arquivo["url"],
-                                    use_container_width=True
+                                    quote=True
+                                )
+
+                                st.markdown(
+                                    f"""
+                                    <a
+                                        href="{url_segura}"
+                                        target="_blank"
+                                        style="
+                                            display:block;
+                                            text-align:center;
+                                            background:#ffffff;
+                                            color:#075da8;
+                                            padding:0.45rem 0.4rem;
+                                            border-radius:8px;
+                                            text-decoration:none;
+                                            font-weight:700;
+                                            border:1px solid #b9d7ef;
+                                            margin-top:0.45rem;
+                                        "
+                                    >
+                                        Abrir
+                                    </a>
+                                    """,
+                                    unsafe_allow_html=True
                                 )
 
 
@@ -1442,9 +1651,9 @@ if projeto_escolhido:
                     )
 
 
-                # ---------------------------------------------
+                # =============================================
                 # DIVISOR
-                # ---------------------------------------------
+                # =============================================
 
                 st.markdown(
                     '<div class="section-divider"></div>',
@@ -1452,27 +1661,22 @@ if projeto_escolhido:
                 )
 
 
-                # ---------------------------------------------
+                # =============================================
                 # FORMULÁRIO
-                # ---------------------------------------------
+                # =============================================
 
                 st.markdown(
                     """
                     <div class="form-section">
 
-                        <div class="form-header">
+                        <div class="form-title">
+                            Registrar análise
+                        </div>
 
-                            <div class="form-title">
-                                Registrar análise
-                            </div>
-
-                            <div class="form-message">
-                                Preencha os campos abaixo para
-                                registrar a análise deste setor.
-                                Cada setor pode analisar o cenário
-                                apenas uma vez.
-                            </div>
-
+                        <div class="form-message">
+                            Preencha os campos abaixo para registrar
+                            a análise deste setor. Cada setor pode
+                            analisar este cenário apenas uma vez.
                         </div>
 
                     </div>
@@ -1485,15 +1689,15 @@ if projeto_escolhido:
                     key=f"form_analise_{cenario['id']}"
                 ):
 
+
+                    # -----------------------------------------
+                    # CAMPOS
+                    # -----------------------------------------
+
                     col_f1, col_f2 = st.columns(
-                        2,
-                        gap="large"
+                        2
                     )
 
-
-                    # -----------------------------------------
-                    # COLUNA 1
-                    # -----------------------------------------
 
                     with col_f1:
 
@@ -1502,9 +1706,13 @@ if projeto_escolhido:
                             placeholder="Ex.: João Silva"
                         )
 
+
                         setor_input = st.selectbox(
                             "Setor",
-                            options=[""] + opcoes_setor,
+                            options=[
+                                ""
+                            ] + opcoes_setor,
+
                             format_func=lambda x:
                                 "Selecione o setor"
                                 if x == ""
@@ -1512,20 +1720,21 @@ if projeto_escolhido:
                         )
 
 
-                    # -----------------------------------------
-                    # COLUNA 2
-                    # -----------------------------------------
-
                     with col_f2:
 
                         status_input = st.selectbox(
                             "Resultado da análise",
-                            options=[""] + opcoes_status,
+
+                            options=[
+                                ""
+                            ] + opcoes_status,
+
                             format_func=lambda x:
                                 "Selecione o resultado"
                                 if x == ""
                                 else x
                         )
+
 
                         motivo_input = st.text_area(
                             "Motivo",
@@ -1536,6 +1745,10 @@ if projeto_escolhido:
                         )
 
 
+                    # -----------------------------------------
+                    # BOTÃO
+                    # -----------------------------------------
+
                     submit = st.form_submit_button(
                         "Salvar análise",
                         type="primary",
@@ -1544,13 +1757,14 @@ if projeto_escolhido:
 
 
                     # ==========================================
-                    # SALVAR
+                    # PROCESSAR
                     # ==========================================
 
                     if submit:
 
+
                         # --------------------------------------
-                        # VALIDAÇÕES
+                        # VALIDAÇÃO DO NOME
                         # --------------------------------------
 
                         if not nome_input.strip():
@@ -1559,11 +1773,21 @@ if projeto_escolhido:
                                 "Informe o nome do analista."
                             )
 
+
+                        # --------------------------------------
+                        # VALIDAÇÃO DO SETOR
+                        # --------------------------------------
+
                         elif not setor_input:
 
                             st.error(
                                 "Selecione o setor responsável."
                             )
+
+
+                        # --------------------------------------
+                        # VALIDAÇÃO DO STATUS
+                        # --------------------------------------
 
                         elif not status_input:
 
@@ -1571,38 +1795,54 @@ if projeto_escolhido:
                                 "Selecione o resultado da análise."
                             )
 
+
+                        # --------------------------------------
+                        # VALIDAÇÃO DA REPROVAÇÃO
+                        # --------------------------------------
+
                         elif (
-                            status_input == "Reprovado"
-                            and not motivo_input.strip()
+                            status_input.lower()
+                            == "reprovado"
+                            and
+                            not motivo_input.strip()
                         ):
 
                             st.error(
                                 "Informe o motivo da reprovação."
                             )
 
-                        else:
 
-                            # ----------------------------------
-                            # VERIFICAR DUPLICIDADE
-                            # ----------------------------------
+                        # --------------------------------------
+                        # TUDO OK
+                        # --------------------------------------
+
+                        else:
 
                             try:
 
-                                filtro_existentes = {
-                                    "property": col_relation,
-                                    "relation": {
-                                        "contains": cenario["id"]
-                                    }
-                                }
+                                # ==============================
+                                # VERIFICAR ANÁLISES EXISTENTES
+                                # ==============================
 
                                 analises_existentes = (
                                     notion.databases.query(
                                         database_id=id_analises,
-                                        filter=filtro_existentes
+
+                                        filter={
+                                            "property":
+                                                col_relation,
+
+                                            "relation": {
+                                                "contains":
+                                                    cenario["id"]
+                                            }
+                                        }
                                     )
                                 )
 
+
                                 setor_ja_analisou = False
+
 
                                 for analise_existente in (
                                     analises_existentes.get(
@@ -1618,8 +1858,9 @@ if projeto_escolhido:
                                         )
                                     )
 
+
                                     setor_existente = (
-                                        get_select_safe(
+                                        get_status_safe(
                                             a_props,
                                             colunas_reais.get(
                                                 "setor"
@@ -1627,14 +1868,20 @@ if projeto_escolhido:
                                         )
                                     )
 
+
                                     if (
                                         setor_existente
                                         == setor_input
                                     ):
 
                                         setor_ja_analisou = True
+
                                         break
 
+
+                                # ==============================
+                                # BLOQUEAR DUPLICIDADE
+                                # ==============================
 
                                 if setor_ja_analisou:
 
@@ -1645,87 +1892,134 @@ if projeto_escolhido:
                                         f"deste cenário."
                                     )
 
-                                else:
 
-                                    # --------------------------
-                                    # CRIAR ANÁLISE
-                                    # --------------------------
+                                # ==============================
+                                # CRIAR ANÁLISE
+                                # ==============================
+
+                                else:
 
                                     data_hoje = (
                                         datetime.now()
-                                        .strftime("%Y-%m-%d")
+                                        .strftime(
+                                            "%Y-%m-%d"
+                                        )
                                     )
+
 
                                     propriedades = {}
 
 
-                                    # TÍTULO
+                                    # --------------------------
+                                    # NOME DO ANALISTA
+                                    # --------------------------
+
                                     if coluna_titulo_analise:
 
                                         propriedades[
                                             coluna_titulo_analise
                                         ] = {
+
                                             "title": [
+
                                                 {
+
                                                     "text": {
+
                                                         "content":
                                                             nome_input.strip()
+
                                                     }
+
                                                 }
+
                                             ]
+
                                         }
 
 
+                                    # --------------------------
                                     # SETOR
+                                    # --------------------------
+
                                     if colunas_reais.get(
                                         "setor"
                                     ):
 
                                         propriedades[
                                             colunas_reais["setor"]
-                                        ] = criar_propriedade_select(
-                                            tipo_setor,
-                                            setor_input
+                                        ] = (
+                                            criar_propriedade_opcao(
+                                                tipo_setor,
+                                                setor_input
+                                            )
                                         )
 
 
+                                    # --------------------------
                                     # STATUS
+                                    # --------------------------
+
                                     if colunas_reais.get(
                                         "status"
                                     ):
 
                                         propriedades[
                                             colunas_reais["status"]
-                                        ] = criar_propriedade_select(
-                                            tipo_status,
-                                            status_input
+                                        ] = (
+                                            criar_propriedade_opcao(
+                                                tipo_status,
+                                                status_input
+                                            )
                                         )
 
 
+                                    # --------------------------
                                     # MOTIVO
+                                    # --------------------------
+
                                     if colunas_reais.get(
                                         "motivo"
                                     ):
 
-                                        propriedades[
-                                            colunas_reais["motivo"]
-                                        ] = {
-                                            "rich_text": (
-                                                [
+                                        if motivo_input.strip():
+
+                                            propriedades[
+                                                colunas_reais["motivo"]
+                                            ] = {
+
+                                                "rich_text": [
+
                                                     {
+
                                                         "text": {
+
                                                             "content":
                                                                 motivo_input.strip()
+
                                                         }
+
                                                     }
+
                                                 ]
-                                                if motivo_input.strip()
-                                                else []
-                                            )
-                                        }
+
+                                            }
+
+                                        else:
+
+                                            propriedades[
+                                                colunas_reais["motivo"]
+                                            ] = {
+
+                                                "rich_text": []
+
+                                            }
 
 
+                                    # --------------------------
                                     # DATA
+                                    # --------------------------
+
                                     if colunas_reais.get(
                                         "data"
                                     ):
@@ -1733,42 +2027,67 @@ if projeto_escolhido:
                                         propriedades[
                                             colunas_reais["data"]
                                         ] = {
+
                                             "date": {
-                                                "start": data_hoje
+
+                                                "start":
+                                                    data_hoje
+
                                             }
+
                                         }
 
 
+                                    # --------------------------
                                     # RELAÇÃO COM CENÁRIO
+                                    # --------------------------
+
                                     propriedades[
                                         col_relation
                                     ] = {
+
                                         "relation": [
+
                                             {
-                                                "id": cenario["id"]
+
+                                                "id":
+                                                    cenario["id"]
+
                                             }
+
                                         ]
+
                                     }
 
 
-                                    # --------------------------
+                                    # ==========================
                                     # SALVAR NO NOTION
-                                    # --------------------------
+                                    # ==========================
 
                                     notion.pages.create(
+
                                         parent={
+
                                             "database_id":
                                                 id_analises
+
                                         },
+
                                         properties=propriedades
+
                                     )
 
+
+                                    # ==========================
+                                    # SUCESSO
+                                    # ==========================
 
                                     st.success(
                                         f"Análise de "
                                         f"'{nome_input.strip()}' "
                                         f"registrada com sucesso!"
                                     )
+
 
                                     st.rerun()
 
@@ -1786,7 +2105,7 @@ if projeto_escolhido:
 
 
 # ============================================================
-# CASO NENHUM PROJETO TENHA SIDO SELECIONADO
+# CASO NÃO TENHA PROJETO
 # ============================================================
 
 else:
