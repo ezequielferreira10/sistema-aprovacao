@@ -45,6 +45,7 @@ def render_html(conteudo):
 
 render_html(
     """
+    <meta name="google" content="notranslate">
     <style>
 
     .stApp { background-color: #f4f7fb; }
@@ -252,20 +253,19 @@ render_html(
     div[data-testid="stTextArea"] textarea { border-radius: 8px; }
     .stButton button { border-radius: 8px; font-weight: 700; }
 
-    /* ======================================================
-       ÚNICA ALTERAÇÃO: BOTÃO "SALVAR ANÁLISE" AZUL
-       ====================================================== */
-
-    div.stButton > button[kind="primary"],
-    div.stForm button[kind="primary"] {
-        background: #0f5b9f !important;
-        border-color: #0f5b9f !important;
-        color: #ffffff !important;
+    /* BOTÃO SALVAR ANÁLISE AZUL */
+    button[data-testid="stFormSubmitButton"],
+    div.stForm button,
+    button.stFormSubmitButton {
+        background-color: #0f5b9f !important;
+        color: white !important;
+        border: 1px solid #0f5b9f !important;
     }
 
-    div.stButton > button[kind="primary"]:hover,
-    div.stForm button[kind="primary"]:hover {
-        background: #0d4f8b !important;
+    button[data-testid="stFormSubmitButton"]:hover,
+    div.stForm button:hover,
+    button.stFormSubmitButton:hover {
+        background-color: #0d4f8b !important;
         border-color: #0d4f8b !important;
     }
 
@@ -283,17 +283,6 @@ render_html(
         .page-title { font-size: 1.8rem; }
         .info-grid { grid-template-columns: 1fr; }
         .scenario-header { flex-direction: column; align-items: flex-start; }
-    }
-
-    button[kind="primary"] {
-        background: #0f5b9f !important;
-        border-color: #0f5b9f !important;
-        color: #ffffff !important;
-    }
-
-    button[kind="primary"]:hover {
-        background: #0d4f8b !important;
-        border-color: #0d4f8b !important;
     }
 
     </style>
