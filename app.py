@@ -24,11 +24,11 @@ st.set_page_config(
     page_title="Compliance Tributário",
     page_icon="🏛️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ============================================================
-# TEXTO DA TELA INICIAL (EDITE AQUI QUISER)
+# TEXTO DA TELA INICIAL (EDITE AQUI SE QUISER)
 # ============================================================
 
 TEXTO_INICIAL = (
@@ -70,47 +70,8 @@ render_html(
     footer { visibility: hidden; }
     header { visibility: hidden; }
 
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f5b9f 0%, #125d9f 100%);
-        border-right: none;
-    }
-
-    section[data-testid="stSidebar"] > div { padding-top: 1.5rem; }
-    section[data-testid="stSidebar"] * { color: white; }
-
-    .sidebar-brand {
-        font-size: 1.25rem;
-        font-weight: 700;
-        letter-spacing: -0.3px;
-        margin-bottom: 1.4rem;
-    }
-
-    .sidebar-line {
-        height: 1px;
-        background: rgba(255,255,255,0.22);
-        margin: 0.5rem 0 1.7rem 0;
-    }
-
-    .sidebar-label {
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        opacity: 0.82;
-        margin-bottom: 0.55rem;
-    }
-
-    .project-selected {
-        background: rgba(255,255,255,0.10);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 10px;
-        padding: 0.75rem 0.85rem;
-        margin-top: 0.75rem;
-        font-size: 0.91rem;
-        font-weight: 600;
-    }
-
-    .project-icon { margin-right: 0.4rem; }
+    /* Sidebar completamente escondida */
+    section[data-testid="stSidebar"] { display: none; }
 
     /* ---------- TELA INICIAL ---------- */
 
@@ -529,10 +490,6 @@ except Exception as e:
 
 if st.session_state.projeto_ativo is None:
 
-    with st.sidebar:
-        render_html('<div class="sidebar-brand">Compliance Tributário</div>')
-        render_html('<div class="sidebar-line"></div>')
-
     col_e, col_c, col_d = st.columns([1, 2, 1])
 
     with col_c:
@@ -553,14 +510,17 @@ if st.session_state.projeto_ativo is None:
 
             projeto_selecionado = st.selectbox(
                 "Escolher o projeto",
-                options=lista_projetos,
-                format_func=lambda x: x["nome"],
+                options=[""] + lista_projetos,
+                format_func=lambda x: "Selecione o projeto" if x == "" else x["nome"],
                 label_visibility="collapsed"
             )
 
             if st.button("Iniciar", type="primary", use_container_width=True):
-                st.session_state.projeto_ativo = projeto_selecionado
-                st.rerun()
+                if projeto_selecionado == "":
+                    st.warning("Escolha um projeto para continuar.")
+                else:
+                    st.session_state.projeto_ativo = projeto_selecionado
+                    st.rerun()
 
         else:
             st.warning("Nenhum projeto encontrado no Notion.")
@@ -574,25 +534,13 @@ if st.session_state.projeto_ativo is None:
 
 projeto_escolhido = st.session_state.projeto_ativo
 
-with st.sidebar:
+# Botão "Trocar projeto" no topo direito
+col_topo, col_trocar = st.columns([6, 1])
 
-    render_html('<div class="sidebar-brand">Compliance Tributário</div>')
-    render_html('<div class="sidebar-line"></div>')
-    render_html('<div class="sidebar-label">Projetos</div>')
-
-    nome_sidebar = html.escape(projeto_escolhido["nome"])
-    render_html(
-        f"""
-        <div class="project-selected">
-            <span class="project-icon">✓</span> {nome_sidebar}
-        </div>
-        """
-    )
-
+with col_trocar:
     if st.button("Trocar projeto", use_container_width=True):
         st.session_state.projeto_ativo = None
         st.rerun()
-
 
 nome_projeto = html.escape(projeto_escolhido["nome"])
 
@@ -675,7 +623,7 @@ else:
     render_html('<div class="section-label">Cenários</div>')
 
     # ========================================================
-    # LOOP DOS CENÁRIOS (igualzinho ao que já funcionava)
+    # LOOP DOS CENÁRIOS (agora fechados por padrão)
     # ========================================================
 
     for cenario in cenarios:
@@ -722,7 +670,8 @@ else:
         else:
             badge_html = '<span class="status-badge status-pendente">Pronto para análise</span>'
 
-        with st.expander(f"▸ {nome_cenario}", expanded=True):
+        # FECHADO por padrão: expanded=False
+        with st.expander(f"▸ {nome_cenario}", expanded=False):
 
             render_html(
                 f"""
