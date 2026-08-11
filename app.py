@@ -3,6 +3,7 @@ from notion_client import Client
 from datetime import datetime
 import urllib.request
 import textwrap
+import base64
 import ssl
 import os
 import html
@@ -218,7 +219,7 @@ render_html(
         font-weight: 600;
     }
 
-    /* ---------- ANEXOS ---------- */
+    /* ---------- ANEXOS (nome + ícones no MESMO box) ---------- */
 
     .files-section { margin-top: 1.3rem; margin-bottom: 0.7rem; }
 
@@ -234,10 +235,12 @@ render_html(
     .file-row {
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
         background: white;
         border: 1px solid #e3e8ee;
         border-radius: 9px;
-        padding: 0.55rem 0.85rem;
+        padding: 0.4rem 0.5rem 0.4rem 0.85rem;
         margin-top: 0.45rem;
     }
 
@@ -249,17 +252,22 @@ render_html(
         text-overflow: ellipsis;
     }
 
-    /* ---------- ÍCONES DE LINHA (visualizar / baixar) ---------- */
+    .file-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        flex-shrink: 0;
+    }
 
+    /* Ícones pequenos */
     .icon-btn {
         display: flex;
         align-items: center;
         justify-content: center;
         background: #ffffff;
         border: 1px solid #dfe5eb;
-        border-radius: 8px;
-        padding: 0.45rem 0.55rem;
-        margin-top: 0.45rem;
+        border-radius: 7px;
+        padding: 0.28rem 0.4rem;
         color: #243447;
         text-decoration: none;
         line-height: 1;
@@ -272,29 +280,6 @@ render_html(
     }
 
     .icon-btn svg { display: block; }
-
-    /* Botão de download: texto invisível, ícone de linha no centro */
-    div[data-testid="stDownloadButton"] button {
-        background-color: #ffffff;
-        background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23243447' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='4' x2='12' y2='15'></line><polyline points='6 9 12 15 18 9'></polyline><line x1='5' y1='20' x2='19' y2='20'></line></svg>");
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: 18px 18px;
-        border: 1px solid #dfe5eb;
-        border-radius: 8px;
-        padding: 0.45rem 0.55rem;
-        color: transparent !important;
-    }
-
-    div[data-testid="stDownloadButton"] button p {
-        color: transparent !important;
-        margin: 0;
-    }
-
-    div[data-testid="stDownloadButton"] button:hover {
-        border-color: #0f5b9f;
-        background-color: #edf5fc;
-    }
 
     .section-divider { height: 1px; background: #e5e9ee; margin: 1.5rem 0; }
 
@@ -479,21 +464,22 @@ def criar_propriedade_opcao(tipo, valor):
 
 
 # ============================================================
-# ÍCONES SVG (estilo linha, iguais entre si)
+# ÍCONES SVG
 # ============================================================
 
+# Olho PREENCHIDO (igual ao da referência)
 ICONE_OLHO = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
-    'stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">'
-    '</path><circle cx="12" cy="12" r="3"></circle></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">'
+    '<path d="M12 5C6.5 5 2.2 8.6 1 12c1.2 3.4 5.5 7 11 7s9.8-3.6 11-7c-1.2-3.4-5.5-7-11-7z" fill="currentColor"/>'
+    '<circle cx="12" cy="12" r="3.6" fill="#ffffff"/>'
+    '<circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg>'
 )
 
+# Seta de download (linha fina)
 ICONE_DOWNLOAD = (
-    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
-    'stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="15"></line>'
-    '<polyline points="6 9 12 15 18 9"></polyline>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" '
+    'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
+    '<line x1="12" y1="4" x2="12" y2="15"></line><polyline points="6 9 12 15 18 9"></polyline>'
     '<line x1="5" y1="20" x2="19" y2="20"></line></svg>'
 )
 
@@ -773,7 +759,7 @@ else:
             )
 
             # ------------------------------------------------
-            # ANEXOS (ícones de linha + tooltip no hover)
+            # ANEXOS: nome + 2 ícones no MESMO quadradinho
             # ------------------------------------------------
 
             if anexos:
@@ -788,50 +774,37 @@ else:
                     """
                 )
 
-                for idx, arquivo in enumerate(anexos):
+                for arquivo in anexos:
 
                     nome_arquivo_html = html.escape(arquivo["nome"])
                     tooltip_nome = html.escape(arquivo["nome"], quote=True)
+                    download_nome = html.escape(arquivo["nome"], quote=True)
                     url_segura = html.escape(arquivo["url"], quote=True)
                     conteudo = baixar_arquivo_notion(arquivo["url"])
 
-                    col_nome, col_ver, col_baixar = st.columns([6, 1, 1])
+                    if conteudo:
+                        conteudo_b64 = base64.b64encode(conteudo).decode("ascii")
+                        link_download = f"data:application/octet-stream;base64,{conteudo_b64}"
+                        attr_download = f'download="{download_nome}"'
+                        attr_target = ""
+                    else:
+                        link_download = url_segura
+                        attr_download = ""
+                        attr_target = 'target="_blank"'
 
-                    with col_nome:
-                        render_html(
-                            f"""
-                            <div class="file-row">
-                                <div class="file-name">📄 {nome_arquivo_html}</div>
-                            </div>
-                            """
-                        )
-
-                    with col_ver:
-                        render_html(
-                            f"""
-                            <a class="icon-btn" href="{url_segura}" target="_blank"
-                               title="Visualizar: {tooltip_nome}">{ICONE_OLHO}</a>
-                            """
-                        )
-
-                    with col_baixar:
-                        if conteudo:
-                            st.download_button(
-                                label="Baixar",
-                                data=conteudo,
-                                file_name=arquivo["nome"],
-                                mime="application/octet-stream",
-                                key=f"download_{cenario['id']}_{idx}",
-                                help=f"Baixar: {arquivo['nome']}",
-                                use_container_width=True
-                            )
-                        else:
-                            render_html(
-                                f"""
+                    render_html(
+                        f"""
+                        <div class="file-row">
+                            <div class="file-name">📄 {nome_arquivo_html}</div>
+                            <div class="file-actions">
                                 <a class="icon-btn" href="{url_segura}" target="_blank"
+                                   title="Visualizar: {tooltip_nome}">{ICONE_OLHO}</a>
+                                <a class="icon-btn" href="{link_download}" {attr_download} {attr_target}
                                    title="Baixar: {tooltip_nome}">{ICONE_DOWNLOAD}</a>
-                                """
-                            )
+                            </div>
+                        </div>
+                        """
+                    )
             else:
                 st.info("Nenhum anexo disponível para este cenário.")
 
