@@ -218,6 +218,8 @@ render_html(
         font-weight: 600;
     }
 
+    /* ---------- ANEXOS ---------- */
+
     .files-section { margin-top: 1.3rem; margin-bottom: 0.7rem; }
 
     .files-label {
@@ -235,7 +237,7 @@ render_html(
         background: white;
         border: 1px solid #e3e8ee;
         border-radius: 9px;
-        padding: 0.7rem 0.85rem;
+        padding: 0.55rem 0.85rem;
         margin-top: 0.45rem;
     }
 
@@ -245,6 +247,41 @@ render_html(
         font-weight: 600;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    /* Botão-ícone (Visualizar / fallback de download) */
+    .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        border: 1px solid #dfe5eb;
+        border-radius: 8px;
+        padding: 0.42rem 0.5rem;
+        margin-top: 0.45rem;
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    .icon-btn:hover {
+        border-color: #0f5b9f;
+        background: #edf5fc;
+    }
+
+    /* Botão de download com cara de ícone */
+    div[data-testid="stDownloadButton"] button {
+        background: #ffffff;
+        border: 1px solid #dfe5eb;
+        border-radius: 8px;
+        padding: 0.42rem 0.5rem;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    div[data-testid="stDownloadButton"] button:hover {
+        border-color: #0f5b9f;
+        background: #edf5fc;
     }
 
     .section-divider { height: 1px; background: #e5e9ee; margin: 1.5rem 0; }
@@ -529,7 +566,7 @@ if st.session_state.projeto_ativo is None:
 
 
 # ============================================================
-# A PARTIR DAQUI: PROJETO ATIVO (tela que já funcionava)
+# A PARTIR DAQUI: PROJETO ATIVO
 # ============================================================
 
 projeto_escolhido = st.session_state.projeto_ativo
@@ -623,7 +660,7 @@ else:
     render_html('<div class="section-label">Cenários</div>')
 
     # ========================================================
-    # LOOP DOS CENÁRIOS (agora fechados por padrão)
+    # LOOP DOS CENÁRIOS (fechados por padrão)
     # ========================================================
 
     for cenario in cenarios:
@@ -670,7 +707,6 @@ else:
         else:
             badge_html = '<span class="status-badge status-pendente">Pronto para análise</span>'
 
-        # FECHADO por padrão: expanded=False
         with st.expander(f"▸ {nome_cenario}", expanded=False):
 
             render_html(
@@ -704,6 +740,10 @@ else:
                 """
             )
 
+            # ------------------------------------------------
+            # ANEXOS (ícones com tooltip no hover)
+            # ------------------------------------------------
+
             if anexos:
                 titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
 
@@ -711,7 +751,7 @@ else:
                     f"""
                     <div class="files-section">
                         <div class="files-label">{titulo_anexos} ({len(anexos)})</div>
-                        <div class="files-message">Baixe os documentos abaixo para revisar antes de registrar sua análise.</div>
+                        <div class="files-message">Passe o cursor sobre os ícones para visualizar ou baixar cada documento.</div>
                     </div>
                     """
                 )
@@ -719,9 +759,11 @@ else:
                 for idx, arquivo in enumerate(anexos):
 
                     nome_arquivo_html = html.escape(arquivo["nome"])
+                    tooltip_nome = html.escape(arquivo["nome"], quote=True)
+                    url_segura = html.escape(arquivo["url"], quote=True)
                     conteudo = baixar_arquivo_notion(arquivo["url"])
 
-                    col_nome, col_btn = st.columns([5, 1])
+                    col_nome, col_ver, col_baixar = st.columns([6, 1, 1])
 
                     with col_nome:
                         render_html(
@@ -732,25 +774,32 @@ else:
                             """
                         )
 
-                    with col_btn:
+                    with col_ver:
+                        # Ícone de OLHO = visualizar (abre em nova aba)
+                        render_html(
+                            f"""
+                            <a class="icon-btn" href="{url_segura}" target="_blank"
+                               title="Visualizar: {tooltip_nome}">👁️</a>
+                            """
+                        )
+
+                    with col_baixar:
                         if conteudo:
+                            # Ícone de SETA = baixar (tooltip no hover)
                             st.download_button(
-                                label="Baixar",
+                                label="⬇️",
                                 data=conteudo,
                                 file_name=arquivo["nome"],
                                 mime="application/octet-stream",
                                 key=f"download_{cenario['id']}_{idx}",
-                                type="secondary",
+                                help=f"Baixar: {arquivo['nome']}",
                                 use_container_width=True
                             )
                         else:
-                            url_segura = html.escape(arquivo["url"], quote=True)
                             render_html(
                                 f"""
-                                <a href="{url_segura}" target="_blank"
-                                   style="display:block;text-align:center;background:#ffffff;color:#075da8;padding:0.45rem 0.4rem;border-radius:8px;text-decoration:none;font-weight:700;border:1px solid #b9d7ef;margin-top:0.45rem;">
-                                    Abrir
-                                </a>
+                                <a class="icon-btn" href="{url_segura}" target="_blank"
+                                   title="Baixar: {tooltip_nome}">⬇️</a>
                                 """
                             )
             else:
