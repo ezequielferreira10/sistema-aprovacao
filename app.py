@@ -249,7 +249,8 @@ render_html(
         text-overflow: ellipsis;
     }
 
-    /* Botão-ícone (Visualizar / fallback de download) */
+    /* ---------- ÍCONES DE LINHA (visualizar / baixar) ---------- */
+
     .icon-btn {
         display: flex;
         align-items: center;
@@ -257,31 +258,42 @@ render_html(
         background: #ffffff;
         border: 1px solid #dfe5eb;
         border-radius: 8px;
-        padding: 0.42rem 0.5rem;
+        padding: 0.45rem 0.55rem;
         margin-top: 0.45rem;
+        color: #243447;
         text-decoration: none;
-        font-size: 1rem;
         line-height: 1;
     }
 
     .icon-btn:hover {
+        color: #0f5b9f;
         border-color: #0f5b9f;
         background: #edf5fc;
     }
 
-    /* Botão de download com cara de ícone */
+    .icon-btn svg { display: block; }
+
+    /* Botão de download: texto invisível, ícone de linha no centro */
     div[data-testid="stDownloadButton"] button {
-        background: #ffffff;
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23243447' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='4' x2='12' y2='15'></line><polyline points='6 9 12 15 18 9'></polyline><line x1='5' y1='20' x2='19' y2='20'></line></svg>");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 18px 18px;
         border: 1px solid #dfe5eb;
         border-radius: 8px;
-        padding: 0.42rem 0.5rem;
-        font-size: 1rem;
-        line-height: 1;
+        padding: 0.45rem 0.55rem;
+        color: transparent !important;
+    }
+
+    div[data-testid="stDownloadButton"] button p {
+        color: transparent !important;
+        margin: 0;
     }
 
     div[data-testid="stDownloadButton"] button:hover {
         border-color: #0f5b9f;
-        background: #edf5fc;
+        background-color: #edf5fc;
     }
 
     .section-divider { height: 1px; background: #e5e9ee; margin: 1.5rem 0; }
@@ -464,6 +476,26 @@ def criar_propriedade_opcao(tipo, valor):
     if tipo == "status":
         return {"status": {"name": valor}}
     return {"select": {"name": valor}}
+
+
+# ============================================================
+# ÍCONES SVG (estilo linha, iguais entre si)
+# ============================================================
+
+ICONE_OLHO = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" '
+    'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+    'stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">'
+    '</path><circle cx="12" cy="12" r="3"></circle></svg>'
+)
+
+ICONE_DOWNLOAD = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" '
+    'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
+    'stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="15"></line>'
+    '<polyline points="6 9 12 15 18 9"></polyline>'
+    '<line x1="5" y1="20" x2="19" y2="20"></line></svg>'
+)
 
 
 # ============================================================
@@ -741,7 +773,7 @@ else:
             )
 
             # ------------------------------------------------
-            # ANEXOS (ícones com tooltip no hover)
+            # ANEXOS (ícones de linha + tooltip no hover)
             # ------------------------------------------------
 
             if anexos:
@@ -775,19 +807,17 @@ else:
                         )
 
                     with col_ver:
-                        # Ícone de OLHO = visualizar (abre em nova aba)
                         render_html(
                             f"""
                             <a class="icon-btn" href="{url_segura}" target="_blank"
-                               title="Visualizar: {tooltip_nome}">👁️</a>
+                               title="Visualizar: {tooltip_nome}">{ICONE_OLHO}</a>
                             """
                         )
 
                     with col_baixar:
                         if conteudo:
-                            # Ícone de SETA = baixar (tooltip no hover)
                             st.download_button(
-                                label="⬇️",
+                                label="Baixar",
                                 data=conteudo,
                                 file_name=arquivo["nome"],
                                 mime="application/octet-stream",
@@ -799,7 +829,7 @@ else:
                             render_html(
                                 f"""
                                 <a class="icon-btn" href="{url_segura}" target="_blank"
-                                   title="Baixar: {tooltip_nome}">⬇️</a>
+                                   title="Baixar: {tooltip_nome}">{ICONE_DOWNLOAD}</a>
                                 """
                             )
             else:
