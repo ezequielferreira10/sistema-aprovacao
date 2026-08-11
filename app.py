@@ -59,7 +59,7 @@ render_html(
     <meta name="google" content="notranslate">
     <style>
 
-    .stApp { background-color: #f4f7fb; }
+    .stApp { background-color: #ffffff; }
 
     .main .block-container {
         max-width: 1250px;
