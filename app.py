@@ -346,6 +346,9 @@ def encontrar_tabela(nome_tabela):
     try:
         response = notion.search(query=nome_tabela)
         for resultado in response.get("results", []):
+            # Só aceita se for um DATABASE de verdade
+            if resultado.get("object") != "database":
+                continue
             titulo = resultado.get("title", [])
             if titulo:
                 texto = titulo[0].get("plain_text", "")
