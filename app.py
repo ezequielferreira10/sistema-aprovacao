@@ -16,7 +16,7 @@ import html
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 
 if not NOTION_TOKEN:
-    st.error("A variável NOTION_TOKEN não foi configurada no Railway.")
+    st.error("A variável NOTION_TOKEN não foi configurada.")
     st.stop()
 
 notion = Client(auth=NOTION_TOKEN)
@@ -29,7 +29,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# TEXTO DA TELA INICIAL (EDITE AQUI SE QUISER)
+# TEXTO DA TELA INICIAL
 # ============================================================
 
 TEXTO_INICIAL = (
@@ -40,7 +40,7 @@ TEXTO_INICIAL = (
 
 
 # ============================================================
-# RENDERIZAÇÃO DE HTML (CORREÇÃO DEFINITIVA)
+# RENDERIZAÇÃO DE HTML
 # ============================================================
 
 def render_html(conteudo):
@@ -71,10 +71,7 @@ render_html(
     footer { visibility: hidden; }
     header { visibility: hidden; }
 
-    /* Sidebar completamente escondida */
     section[data-testid="stSidebar"] { display: none; }
-
-    /* ---------- TELA INICIAL ---------- */
 
     .landing {
         text-align: center;
@@ -112,8 +109,6 @@ render_html(
         margin-top: 3rem;
         margin-bottom: 0.6rem;
     }
-
-    /* ---------- CABEÇALHO ---------- */
 
     .page-header {
         background: linear-gradient(135deg, #0f5b9f 0%, #155f9f 100%);
@@ -219,8 +214,6 @@ render_html(
         font-weight: 600;
     }
 
-    /* ---------- ANEXOS (nome + ícones no MESMO box) ---------- */
-
     .files-section { margin-top: 1.3rem; margin-bottom: 0.7rem; }
 
     .files-label {
@@ -259,7 +252,6 @@ render_html(
         flex-shrink: 0;
     }
 
-    /* Ícones pequenos */
     .icon-btn {
         display: flex;
         align-items: center;
@@ -299,7 +291,6 @@ render_html(
     div[data-testid="stTextArea"] textarea { border-radius: 8px; }
     .stButton button { border-radius: 8px; font-weight: 700; }
 
-    /* BOTÃO SALVAR ANÁLISE AZUL */
     .stForm button,
     form[data-testid="stForm"] button,
     [data-testid="stFormSubmitButton"] button {
@@ -343,6 +334,7 @@ render_html(
 # ============================================================
 
 def encontrar_tabela(nome_tabela):
+    """Busca um DATABASE no Notion pelo nome exato. Ignora páginas normais."""
     try:
         response = notion.search(query=nome_tabela)
         for resultado in response.get("results", []):
@@ -470,7 +462,6 @@ def criar_propriedade_opcao(tipo, valor):
 # ÍCONES SVG
 # ============================================================
 
-# Olho PREENCHIDO (igual ao da referência)
 ICONE_OLHO = (
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">'
     '<path d="M12 5C6.5 5 2.2 8.6 1 12c1.2 3.4 5.5 7 11 7s9.8-3.6 11-7c-1.2-3.4-5.5-7-11-7z" fill="currentColor"/>'
@@ -478,7 +469,6 @@ ICONE_OLHO = (
     '<circle cx="12" cy="12" r="1.8" fill="currentColor"/></svg>'
 )
 
-# Seta de download (linha fina)
 ICONE_DOWNLOAD = (
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" '
     'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'
@@ -496,15 +486,15 @@ id_cenarios = encontrar_tabela("Cenário")
 id_analises = encontrar_tabela("Análises")
 
 if not id_projetos:
-    st.error("Tabela 'Projetos' não encontrada no Notion.")
+    st.error("Tabela 'Projetos' não encontrada no Notion. Verifique o nome e as permissões da integração.")
     st.stop()
 
 if not id_cenarios:
-    st.error("Tabela 'Cenário' não encontrada no Notion.")
+    st.error("Tabela 'Cenário' não encontrada no Notion. Verifique o nome e as permissões da integração.")
     st.stop()
 
 if not id_analises:
-    st.error("Tabela 'Análises' não encontrada no Notion.")
+    st.error("Tabela 'Análises' não encontrada no Notion. Verifique o nome e as permissões da integração.")
     st.stop()
 
 try:
@@ -515,7 +505,7 @@ except Exception as e:
 
 
 # ============================================================
-# ESTADO DA SESSÃO (controla tela inicial x tela do projeto)
+# ESTADO DA SESSÃO
 # ============================================================
 
 if "projeto_ativo" not in st.session_state:
@@ -523,7 +513,7 @@ if "projeto_ativo" not in st.session_state:
 
 
 # ============================================================
-# CARREGAR PROJETOS (usado na tela inicial)
+# CARREGAR PROJETOS
 # ============================================================
 
 lista_projetos = []
@@ -543,7 +533,7 @@ except Exception as e:
 
 
 # ============================================================
-# TELA INICIAL (CAPA)
+# TELA INICIAL
 # ============================================================
 
 if st.session_state.projeto_ativo is None:
@@ -587,12 +577,11 @@ if st.session_state.projeto_ativo is None:
 
 
 # ============================================================
-# A PARTIR DAQUI: PROJETO ATIVO
+# PROJETO ATIVO
 # ============================================================
 
 projeto_escolhido = st.session_state.projeto_ativo
 
-# Botão "Trocar projeto" no topo direito
 col_topo, col_trocar = st.columns([6, 1])
 
 with col_trocar:
@@ -680,10 +669,6 @@ else:
 
     render_html('<div class="section-label">Cenários</div>')
 
-    # ========================================================
-    # LOOP DOS CENÁRIOS (fechados por padrão)
-    # ========================================================
-
     for cenario in cenarios:
 
         props = cenario.get("properties", {})
@@ -760,10 +745,6 @@ else:
                 </div>
                 """
             )
-
-            # ------------------------------------------------
-            # ANEXOS: nome + 2 ícones no MESMO quadradinho
-            # ------------------------------------------------
 
             if anexos:
                 titulo_anexos = "Anexo" if len(anexos) == 1 else "Anexos"
@@ -938,4 +919,3 @@ else:
                         except Exception as e:
                             st.error("Não foi possível salvar a análise.")
                             st.caption(f"Detalhes técnicos: {e}")
-
